@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Testing OCLIF apps with Jest </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Testing OCLIF apps with Jest</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: May 25, 2018</time>
+    <span>486 Words</span>
+    <span
+      >Takes 3 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>A couple of weeks ago I spent sometime migrating <a href="https://beaujs.com">Beau</a> from
+commander to OCLIF. I really liked how every command in OCLIF is a stand alone
+class, it just felt tidier. Migrating the CLI was a breeze and I had the whole
+thing running in a couple of hours.</p>
+<p>After I was done I decided I wanted to add some tests. I mostly cared about the
+output so all I wanted to do was snapshot it and let Jest warn me if it changed
+by accident. I mostly write tests to make rewriting things easier so snapshotting
+covers about 95% of my testing.</p>
+<p>OCLIF recommends you use mocha and fancy-test for testing apps which is fine but
+since I was already using Jest I didn't want to add even more dependencies. The
+test helpers OCLIF provides seem nice, they mostly handle stdout and stderr, and
+http requests. These are handy but since I only cared about the output I figured
+I wouldn't need them.</p>
+<p>OCLIF makes testing super easy. Every command is a class and every class has a
+static <code>run</code> method which you can use to, <em>you guessed it</em>, run the command. It
+takes an array with the arguments the command would normally receive. Given that,
+testing is made super easy.</p>
+<p>Let's create a Test command that prints "test" and test that it does so.</p>
+<p>Here's our test command:</p>
+<pre><code class="language-javascript">const { Command } = require('@oclif/command');
+
+class TestCommand extends Command {
+	async run() {
+		console.log('Test');
+	}
+}
+
+module.exports = TestCommand;
+</code></pre>
+<p>If the CLI was called <code>hello</code> and we ran <code>hello test</code> we'd get 'test' back. Let's
+add a test to confirm we are getting the expected result back.</p>
+<pre><code class="language-javascript">describe('Test Command', () => {
+	it('should print Test', async () => {
+		let result = await TestCommand.run([]);
+		expect(result).toBe('Test');
+	});
+});
+</code></pre>
+<p>This is cool, but wouldn't work. Unfortunately the output is written to the
+STDOUT so that means that <code>run</code> doesn't actually return anything. Luckily for us
+Jest has spies built-in so all it takes is to add a spy to that call:</p>
+<pre><code class="language-javascript">...
+	it('should print Test', async () => {
+		let spy = jest.spyOn(process.stdout, 'write');
+
+		await TestCommand.run([]);
+		expect(spy).toHaveBeenCalledWith('Test');
+	});
+...
+</code></pre>
+<p>To simplify this you can move the spy to a <code>beforeEach</code>.</p>
+<pre><code class="language-javascript">describe('Test Command', () => {
+	let result;
+
+	beforeEach(() => {
+		result = [];
+		jest
+			.spyOn(process.stdout, 'write')
+			.mockImplementation(val =>
+				result.push(val)
+			);
+	});
+
+	afterEach(() => jest.restoreAllMocks());
+
+	it('should print Test', async () => {
+		await TestCommand.run([]);
+		expect(result).toContain('Test')
+	});
+});
+
+</code></pre>
+<p>Whenever <code>process.stdout.write</code> is called you push the value into the result array.
+You can then check if the correct values are a part of the array. I'd just snapshot
+it and call it the day though.</p>
+<p>Remember that the array that run expects is supposed to be the argv for that command.
+So they should be in the order they are expected and should all be strings.</p>
+<p>Have fun testing your CLIs.</p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

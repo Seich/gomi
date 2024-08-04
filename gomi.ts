@@ -3,7 +3,7 @@ import { ensureDirSync, existsSync } from "@std/fs";
 import { BlogPost, getBlogPosts } from "./blogPosts.ts";
 import { StaticFile, getStaticFiles } from "./staticFiles.ts";
 import { compileFile } from "./compiler.ts";
-import { LayoutCalculator } from "./layouts.ts";
+import { LayoutStore } from "./layouts.ts";
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
@@ -12,12 +12,12 @@ export class Gomi {
 
   posts: BlogPost[] = [];
   staticFiles: StaticFile[] = [];
-  layouts: LayoutCalculator;
+  layouts: LayoutStore;
 
   constructor(
     posts: BlogPost[],
     staticFiles: StaticFile[],
-    layouts: LayoutCalculator,
+    layouts: LayoutStore,
   ) {
     if (!posts || !staticFiles) {
       throw new Error("You probably meant to use Gomi.build() instead.");
@@ -43,7 +43,7 @@ export class Gomi {
 
     const blogPosts = await getBlogPosts(Gomi.postsDir);
     const staticFiles = await getStaticFiles(Gomi.inputDir);
-    const layouts = await LayoutCalculator.build(Gomi.inputDir);
+    const layouts = await LayoutStore.build(Gomi.inputDir);
 
     ensureDirSync(Gomi.outputDir);
 
@@ -52,7 +52,7 @@ export class Gomi {
 
   compile() {
     [...this.posts, ...this.staticFiles].forEach((file) =>
-      compileFile(file, this.layouts),
+      compileFile(file, this),
     );
   }
 }

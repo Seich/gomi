@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Writing Plugins for Beau </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Writing Plugins for Beau</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: April 06, 2017</time>
+    <span>414 Words</span>
+    <span
+      >Takes 2 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>Currently Beau allows plugins to do two different transformations. You can change the request settings right before they are used to make the request and you can transform the response after the request is finished. This covers all use cases I've come up with so far. I'll go over the basics or writing a plugin in this post.</p>
+<h2>The Plugin</h2>
+<p>The first step is writing the plugin. A Beau plugin is a Javascript class that defines any of these methods: <code>preRequest(requestSettings, originalRequest)</code> and <code>postResponse(response)</code>. They can also receive settings as part of their <code>beau.yml</code>configuration. Here's the basic skeleton for a new plugin:</p>
+<pre><code class="language-javascript">class MyPlugin {
+    constructor(settings = {}) {
+        this.settings = settings;
+    }
+
+    preRequest(req, orig) {}
+
+    postResponse(res) {}
+
+}
+
+module.exports = MyPlugin;
+</code></pre>
+<p>All you are missing is a basic <code>package.json</code> to finish the module (just run <code>npm init</code> and go through the steps). Once that's done you can install your plugin globally and use it as part of your <code>beau.yml</code> like this:</p>
+<pre><code class="language-yaml">Host: http://localhost:9000
+   plugins:
+       - MyPlugin:
+           data:
+               name: Sergio
+           secret: ssh
+
+GET /profile:
+   alias: profile
+
+GET /:
+   skip_jwt: true
+   alias: home
+</code></pre>
+<p>Our plugin will generate a jwt using the secret and data settings and send that along with every request. If <code>skip_jwt: true</code> is part of the request's configuration it won't attach the header. First I'll install <code>jsonwebtoken</code>:</p>
+<pre><code>npm install jsonwebtoken -S
+</code></pre>
+<p>Now all I need is to modify the preRequest so that it changes the headers and includes an Authorization with the bearer token:</p>
+<pre><code class="language-javascript">preRequest(req, orig) {
+    let token = jwt.sign(this.settings.data || {}, this.settings.secret);
+
+    req.headers.Authorization = `Bearer ${token}`;
+}
+</code></pre>
+<p>This will attach the authorization header to every request. We should also handle the case were certain requests don't need the  header. In this case, I'll just check if the original request configuration has the field:</p>
+<pre><code class="language-javascript">preRequest(req, orig) {
+    if (orig.skip_jwt) {
+        return;
+    }
+
+    let token = jwt.sign(this.settings.data || {}, this.settings.secret);
+
+    req.headers.Authorization = `Bearer ${token}`;
+}
+</code></pre>
+<p>That's it. Like I said before, it's pretty simple. This plugin as-is allows us for automatic token generation for certain requests. We can get as fancy or keep it as simple as we want. For now, I'll publish that plugin as <a href="https://github.com/Seich/beau-jwt">beau-jwt</a> and will make more improvements as I see fit.</p>
+<h2>Conclusion</h2>
+<p>Writing a plugin is pretty easy. Beau doesn't really do much so modifying requests is pretty straightforward and allows for nice, clean configuration files. Hopefully someone will think of cool things to do with these.</p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

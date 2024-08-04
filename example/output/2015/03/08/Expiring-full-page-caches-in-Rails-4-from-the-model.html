@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Expiring full-page caches in Rails 4 from the model </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Expiring full-page caches in Rails 4 from the model</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: March 08, 2015</time>
+    <span>175 Words</span>
+    <span
+      >Takes 1 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>Recently I was struggling with Rail’s full-page cache. Ever since it was moved out of core I can’t seem to get sweepers to work correctly. After fiddling around for several hours I finally found the best solution possible (excluding sweepers, that is), invalidating the cache on the model’s callbacks. Here’s how it looks:</p>
+<pre><code class="language-ruby">class Ad &#x3C; ActiveRecord::Base
+  after_save :clear_cache
+  after_destroy :clear_cache
+
+  def clear_cache
+        ActionController::Base.expire_page('/ads.json')
+  end
+end
+</code></pre>
+<p>There’s a couple of gotchas:</p>
+<ol>
+<li>You can’t use the nice syntax that’s available on controllers when you use <code>expire_page</code>, you have to pass the route to the file as a string. I couldn’t get it to work any other way (You could use url helpers to come up with this route, I suppose).</li>
+<li>You have to make sure to expire any additional pages that might have changed base on the model’s relationship since this won’t handle it for you.</li>
+</ol>
+<p>Other than these 2 things it’s pretty straight-forward and easy to use. I hope I don’t have to use full page caching again any time soon.</p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

@@ -7,6 +7,7 @@ export interface StaticFile {
   filename: string;
   input: string;
   ext: string;
+  meta: Record<string, never>;
 }
 
 const getStaticFile = (input: string, url: string): StaticFile => {
@@ -17,6 +18,7 @@ const getStaticFile = (input: string, url: string): StaticFile => {
     url,
     input,
     ext,
+    meta: {},
   };
 };
 

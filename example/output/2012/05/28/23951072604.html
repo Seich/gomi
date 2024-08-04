@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Playing with Arduinos, RFID cards and Ruby </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Playing with Arduinos, RFID cards and Ruby</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: May 28, 2012</time>
+    <span>610 Words</span>
+    <span
+      >Takes 3 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p><em>This is probably one of the coolest things I’ve worked on in a while and I also happen to have time to write a blog post about it, which is great, I love working with hardware from time to time.</em></p>
+<p>It definitely isn’t the biggest programming challenge I’ve had but it is pretty cool and I am certain others might find it interesting. Yesterday, I was helping my sister with a project she was doing for her professional practice (she is a very weird kind of engineer who specializes in automation stuff, she is great at it), she was basically asked to open a door with a RFID card.</p>
+<p><img src="http://media.tumblr.com/tumblr_m4r3qapJDn1qazvm1.jpg" alt=""></p>
+<p>To do this, she had a very simple plan, we plug an RFID card reader into a computer which then sends the RFID over to a computer and then tells an Arduino to open the door. She used this RFID Reader (RFID Reader ID-20 (125 kHz)) which is pretty inexpensive and easy to plug into a computer.</p>
+<p><img src="http://media.tumblr.com/tumblr_m4r3roDKpw1qazvm1.jpg" alt=""></p>
+<p>This was fairly straight-forward for her, she mounted the RFID card reader into a board and plugged it into her computer along with her Arduino. She then fired up putty and set it to read the RFID card reader’s serial port (COM 9, in our case) which showed us the RFID of any card we read. </p>
+<p><img src="http://media.tumblr.com/tumblr_m4r3qluG5S1qazvm1.jpg" alt=""></p>
+<p>This is where I came in, she isn’t that much of a coder so she asked me for help on how to finish the connection between the RFID reader and the Arduino. This is what I came up in Ruby:</p>
+<pre><code class="language-ruby">require "serialport"
+
+@rfid_reader = SerialPort.new 4 # Open COM 5
+@arduino = SerialPort.new 2 # Open COM 3
+
+@valid_ids = ['4500B8D690BB']
+
+def readRFID
+  rfid = @rfid_reader.gets
+  rfid.strip!
+  rfid.slice(0) if rfid.size == 13
+  rfid.slice(0..1) if rfid.size == 14
+
+  return rfid
+end
+
+puts "Waiting for input..."
+loop do
+  rfid = readRFID # Get the RFID of the current card
+  if !rfid.empty?
+    if @valid_ids.include? rfid # is the ID valid?
+      puts "RFID: " + rfid
+
+      # Send the arduino a signal so it opens the lock.
+      @arduino.write "1"
+    else
+      puts "Invalid RFID: " + rfid
+      @arduino.write ""
+    end
+  end
+  @arduino.write ""
+end
+</code></pre>
+<p>I was actually going to use C++ but I prefer using Ruby whenever possible. This is a very simple code snippet but it did the job wonderfully. The code is documented and very simple, I used the fabulous ruby-serialport gem which, took care of all the heavy lifting for me.</p>
+<p>This was only half of the work though, we also needed to get the Arduino to wait for an input coming from the computer and do something whenever a value is received, in this case we wanted to open a lock so that’s what we’ll do.</p>
+<pre><code class="language-c">void setup () {
+  Serial.begin (9600);
+  pinMode (12, OUTPUT);
+}
+
+void serialEvent() {
+  digitalWrite(12, HIGH);
+  delay(2000);
+  digitalWrite(12, LOW);
+  Serial.read();
+}
+</code></pre>
+<p>The code is even simpler than the Ruby one running on the computer. All it does is wait for there to be an input and then activate a pin when there is one. Ruby is pretty much doing all of the actual processing and telling the Arduino when and what to do.</p>
+<p><img src="http://media.tumblr.com/tumblr_m4r3s7jnwp1qazvm1.png" alt=""></p>
+<p>Finally, all we had to do was fire up the terminal and run our Ruby program which would then wait for there to be an input form the RFID reader. Whenever there’s an input it’ll log it and then, if the RFID is registered, tell the Arduino to open the lock. And that’s basically it, it made a nice problem to solve for fun.</p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

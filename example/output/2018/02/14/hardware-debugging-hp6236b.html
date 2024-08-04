@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Hardware Debugging: Fixing My HP6236B </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Hardware Debugging: Fixing My HP6236B</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: February 14, 2018</time>
+    <span>406 Words</span>
+    <span
+      >Takes 2 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>I recently added an HP6236B to my small but ever-growing vintage test equipment
+collection. It was in amazing condition when shipped but got smashed quite a bit
+on its way to me. The initial test wasn't promising:</p>
+<p>The insides looked really clean, and nothing seem out of place so I started
+going through the manual's debug steps. According to the manual a voltage
+reference should have been broken. So I started there. After replacing the
+reference the power supply behaved exactly the same. It behaved exactly the same
+even without the voltage reference in place so it had to be something else. I
+then proceeded to go through all the test points the manual had marked. All 15
+of them seemed normal.</p>
+<p><img src="/files/2018-02-14-hardware-debugging-hp6236b/insides.jpg" alt="Inside shot of the power supply"></p>
+<p>This took a long time and didn't really lead anywhere. I gave up and put the
+power supply away for a couple of days. The next time I got around to tinkering
+around with it I decided it was time to see what Jake, my oscilloscope thought
+about it.</p>
+<p><img src="/files/2018-02-14-hardware-debugging-hp6236b/oscilloscope.jpg" alt="Jake showing a square-ish wave on screen."></p>
+<p>Something was immediately obvious now, the power supply was oscillating quite a
+bit. Oddly enough, the -20v rail was actually working as intended but with it's
+range limited to what the 20v rail was stuck to. This was my first major clue. A
+quick check on the schematic showed that the likely culprit were the filtering
+capacitors near the output (C1 and C11).</p>
+<p><img src="/files/2018-02-14-hardware-debugging-hp6236b/schematic.png" alt="The schematic"></p>
+<p>I went ahead and removed them, replacing C1 with the closest capacitor I could
+find, a 220µF one. It was close enough. The power supply came to life and
+started working <em>almost</em> as intended.</p>
+<p>The next day I made a quick visit to a local electronic store and got the
+capacitors that needed replacement. A quick soldering job later and power supply
+was back to working as intended. I started fixing some of the broken pieces,
+like the meter holders. Those were not salvageable so I designed and 3d printed
+new ones.</p>
+<p>Download Meter Holders</p>
+<p><img src="/files/2018-02-14-hardware-debugging-hp6236b/holders.jpg" alt="The broken holders"></p>
+<p>Once all the pieces were in, I resoldered the meters, placed everything back
+together and closed it up. I did some load testing and calibration using my
+Kikusui PLZ72w and it was good to go.</p>
+<p>It found a nice place right next to my DC load.</p>
+<p><img src="/files/2018-02-14-hardware-debugging-hp6236b/final.jpg" alt="The final piece"></p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

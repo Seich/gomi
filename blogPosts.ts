@@ -8,7 +8,7 @@ export interface BlogPost {
   input: string;
   ext: string;
   meta: {
-    date: Temporal.PlainDate;
+    date: string;
   };
 }
 
@@ -27,7 +27,7 @@ const getBlogPost = (input: string): BlogPost => {
     ext: ".html",
   });
 
-  const url = [...dateComponents, filename].join("/");
+  const url = [...name.split("-").slice(0, 3), filename].join("/");
 
   return {
     type: "blogPost",
@@ -35,7 +35,7 @@ const getBlogPost = (input: string): BlogPost => {
     url,
     input,
     ext,
-    meta: { date },
+    meta: { date: date.toString() },
   };
 };
 

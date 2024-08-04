@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Using MapKit with Swift </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Using MapKit with Swift</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: July 29, 2014</time>
+    <span>448 Words</span>
+    <span
+      >Takes 2 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>I've been using Swift a lot lately. I wanted to start making iOS apps a while ago but Objective-C is frankly, not worth the trouble. Swift on the other hand is actually fun to use and I love experiencing how the language evolves.</p>
+<p>This weekend I started working on a small app I've wanted for a while but got stuck when it came to implementing a map with MapKit. I couldn't find documentation or code samples on how to do it anywhere. Turns out that it's not hard at all! It took very little fiddling around before I figured it out. Here's how I did it:</p>
+<h2>First, create a new project</h2>
+<p>I started with a <strong>Single View Application</strong>.</p>
+<p><img src="/files/2014-07-29-using-mapkit/step_1.png" alt="New Project Screen">
+Then added a MKMapView to the view controller. After that, imported <code>MapKit</code> into the view controller's code. Finally, I added a new reference outlet to the map called <em>map</em>.</p>
+<h2>Setup your desired location</h2>
+<p>Now our map is ready to display a location. You'll need a couple of things to set it to the right place. First, you need a location in the form of a latitude and longitude and a CLLocationCoordinate2D.</p>
+<pre><code class="language-swift">var location = CLLocationCoordinate2D(
+    latitude: 16.40,
+    longitude: -86.34
+)
+</code></pre>
+<p>Now, we need to tell the map what the area spanned by the region is. For this we use <code>MKCoordinateSpanMake</code>. Which, as you probably guessed, creates a <code>MKCoordinateSpan</code>.</p>
+<pre><code class="language-swift">var span = MKCoordinateSpanMake(1, 1)
+</code></pre>
+<p>After that we just need to define the region using these two things:</p>
+<pre><code class="language-swift">var region = MKCoordinateRegion(center: location, span: span)
+</code></pre>
+<p>And finally, we set this region to the map:</p>
+<pre><code class="language-swift">map.setRegion(region, animated: true)
+</code></pre>
+<h2>Bonus: Adding an annotation</h2>
+<p>Adding an annotation is actually quite easy. We start by creating a new MKPointAnnotation instance. It'll display the default red pin which, might not be as pretty but it'll get the job done.</p>
+<pre><code class="language-swift">var annotation = MKPointAnnotation()
+</code></pre>
+<p>Afterwards, we can set it's coordinates, title and subtitle to place it wherever we want and to add the text it's callout will display when tapped.</p>
+<pre><code class="language-swift">annotation.coordinate = location
+annotation.title = "Roatan"
+annotation.subtitle = "Honduras"
+</code></pre>
+<p>Finally, we add it to the map like this:</p>
+<pre><code class="language-swift">map.addAnnotation(annotation)
+</code></pre>
+<p>Here's my final code:</p>
+<pre><code class="language-swift">import UIKit
+import MapKit
+
+class ViewController: UIViewController {
+
+    @IBOutlet weak var map: MKMapView!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        var location = CLLocationCoordinate2D(
+            latitude: 16.40,
+            longitude: -86.34
+        )
+
+        var span = MKCoordinateSpanMake(0.5, 0.5)
+        var region = MKCoordinateRegion(center: location, span: span)
+
+        map.setRegion(region, animated: true)
+
+        var annotation = MKPointAnnotation()
+        annotation.coordinate = location
+        annotation.title = "Roatan"
+        annotation.subtitle = "Honduras"
+
+        map.addAnnotation(annotation)
+    }
+}
+</code></pre>
+<p>And here's what my app looks like:
+</p>
+<h2>Additional Resources</h2>
+<p><a href="https://developer.apple.com/library/ios/documentation/userexperience/Conceptual/LocationAwarenessPG/AnnotatingMaps/AnnotatingMaps.html">Location and Maps Programming Guide</a></p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<header>
+  <h1>
+    <a href="{{post.url}}">{{page.title}}</a>
+  </h1>
+
+  <aside>
+    <time>{{ page.date | date: "%B %d, %Y" | prepend: 'Posted on: ' }}</time>
+    <span>{{ content | number_of_words | append: ' Words' }}</span>
+    <span
+      >{{ content | number_of_words | plus:91 | divided_by:180.0 | append:'.' |
+      split:'.' | first | prepend: 'Takes ' | append: ' minutes to read'}}</span
+    >
+  </aside>
+</header>
+<article>
+  {{ content }}
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>

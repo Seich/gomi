@@ -1,11 +1,11 @@
 import { walk } from "@std/fs";
-import { dirname, join, resolve } from "@std/path";
+import { dirname, join } from "@std/path";
 
 type LayoutsMap = {
   [key: string]: string;
 };
 
-export class LayoutCalculator {
+export class LayoutStore {
   layouts: LayoutsMap = {};
   inputDir: string = "";
 
@@ -13,6 +13,10 @@ export class LayoutCalculator {
     if (!layouts) throw new Error("You meant to call LayoutCalculator.build()");
     this.inputDir = inputDir;
     this.layouts = layouts;
+  }
+
+  static replaceInLayout(content: string, layout: string) {
+    return layout.replace(/{{\s?content\s?}}/, content);
   }
 
   static async build(inputDir: string) {
@@ -37,7 +41,7 @@ export class LayoutCalculator {
 
       while (currentDir !== join(inputDir, "..")) {
         if (layouts[currentDir]) {
-          layout = layouts[currentDir].replace(/{{\s?content\s?}}/, layout);
+          layout = LayoutStore.replaceInLayout(layout, layouts[currentDir]);
         }
         currentDir = join(currentDir, "..");
       }
@@ -45,7 +49,7 @@ export class LayoutCalculator {
       layouts[path] = layout;
     });
 
-    return new LayoutCalculator(inputDir, layouts);
+    return new LayoutStore(inputDir, layouts);
   }
 
   for(filepath: string) {
@@ -56,5 +60,10 @@ export class LayoutCalculator {
     }
 
     return this.layouts[path];
+  }
+
+  use(content: string, filepath: string) {
+    const layout = this.for(filepath);
+    return LayoutStore.replaceInLayout(content, layout);
   }
 }

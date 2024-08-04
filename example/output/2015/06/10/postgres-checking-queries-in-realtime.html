@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>David Díaz  | Postgres: Checking Queries in Real Time </title>
+
+	<link rel="stylesheet" href="/css/screen.css">
+	<link rel="alternate" type="application/rss+xml" title="RSS Feed for martianwabbit.com" href="https://martianwabbit.com/feed.xml" />
+	<link rel="me" href="https://mastodon.social/@seich" />
+</head>
+<body>
+<div id="top">
+	<h1><a href="/">David Díaz<span>.</span></a></h1>
+</div>
+
+<header>
+  <h1>
+    <a href="">Postgres: Checking Queries in Real Time</a>
+  </h1>
+
+  <aside>
+    <time>Posted on: June 10, 2015</time>
+    <span>164 Words</span>
+    <span
+      >Takes 1 minutes to read</span
+    >
+  </aside>
+</header>
+<article>
+  <p>Recently I came around a really simple way of checking what queries are going on in Postgres at any given time. Basically what you want to do is tell Postgres to log all queries and then you can tail the log file.</p>
+<p>The first step is to tell Postgres to log all queries. To do that you go to your postgresql.conf file (mine’s here: ~/Library/Application Support/Postgres/var-9.4) and set the following options:</p>
+<pre><code>logging_collector = on
+log_directory = ‘pg_log’
+log_statement = ‘all’
+</code></pre>
+<p>Once you’ve configured these values Postgres will be dumping all queries into the current log file at pg_log. Now you can tail your log file and see what queries are happening in real time.</p>
+<pre><code># Change this to your log’s folder.
+
+tail -f ~/Library/Application\ Support/Postgres/var-9.4/pg_log/*
+</code></pre>
+<p>Also, it’s worth noting that Pg Admin has a log viewer you can use for this task. Just go to Tools > Server Status and you should get this window:</p>
+<p><img src="/files/2015-06-10-postgres-checking-queries/pg_admin.png" alt="Screenshot of PG Admin Log"></p>
+
+  <p class="comments">
+    Have a comment? Feel free to
+    <a href="mailto:seich@martianwabbit.com">email me</a>.<br />
+    Did you enjoy this post?
+    <a href="https://www.buymeacoffee.com/seich">Buy me a coffee ☕️</a>.
+  </p>
+</article>
+
+
+<footer>
+	<p>David Díaz © All Rights Reserved.</p>
+</footer>
+</body>
+</html>
