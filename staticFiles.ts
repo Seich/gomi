@@ -1,16 +1,8 @@
 import { walk } from "@std/fs";
 import { parse } from "@std/path";
+import { ContentUnit } from "./gomi.ts";
 
-export interface StaticFile {
-  type: "staticFile";
-  url: string;
-  filename: string;
-  input: string;
-  ext: string;
-  meta: Record<string, never>;
-}
-
-const getStaticFile = (input: string, url: string): StaticFile => {
+const getStaticFile = (input: string, url: string): ContentUnit => {
   const { base, ext } = parse(input);
   return {
     type: "staticFile",
@@ -28,7 +20,7 @@ export const getStaticFiles = async (inputDir: string) => {
     includeSymlinks: false,
   });
 
-  const staticFiles: StaticFile[] = [];
+  const staticFiles: ContentUnit[] = [];
   for await (const file of files) {
     if (file.name.startsWith(".")) continue; // Exclude hidden files
     if (file.path.includes("/_")) continue; // Exclude files under dirs that starts with _

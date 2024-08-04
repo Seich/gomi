@@ -10,3 +10,4 @@ devenv.local.nix
 .cache
 
 .env
+example/output

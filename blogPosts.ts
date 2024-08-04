@@ -1,18 +1,9 @@
 import { format, parse } from "@std/path";
+import { test as frontmatterPresent, extractYaml } from "@std/front-matter";
 import { walk } from "@std/fs";
+import { ContentUnit } from "./gomi.ts";
 
-export interface BlogPost {
-  type: "blogPost";
-  url: string;
-  filename: string;
-  input: string;
-  ext: string;
-  meta: {
-    date: string;
-  };
-}
-
-const getBlogPost = (input: string): BlogPost => {
+const getBlogPost = async (input: string): Promise<ContentUnit> => {
   // Parse filename
   const { name, ext } = parse(input);
 
@@ -29,13 +20,25 @@ const getBlogPost = (input: string): BlogPost => {
 
   const url = [...name.split("-").slice(0, 3), filename].join("/");
 
+  // Read content
+  const fileContent = await Deno.readTextFile(input);
+  let body = fileContent;
+  let attrs: Record<string, string> = {};
+
+  if (frontmatterPresent(fileContent)) {
+    const frontmatter = extractYaml<Record<string, string>>(fileContent);
+    body = frontmatter.body;
+    attrs = frontmatter.attrs;
+  }
+
   return {
     type: "blogPost",
     filename,
     url,
     input,
     ext,
-    meta: { date: date.toString() },
+    meta: { date: date.toString(), ...attrs },
+    content: body,
   };
 };
 
@@ -46,12 +49,13 @@ export const getBlogPosts = async (postsDir: string) => {
     includeSymlinks: false,
   });
 
-  const blogPosts = [];
+  const blogPosts: ContentUnit[] = [];
   for await (const file of files) {
-    blogPosts.push(getBlogPost(file.path));
+    const post = await getBlogPost(file.path);
+    blogPosts.push(post);
   }
 
   return blogPosts.sort((a, b) =>
-    Temporal.PlainDate.compare(a.meta.date, b.meta.date),
+    Temporal.PlainDate.compare(b.meta.date, a.meta.date),
   );
 };

@@ -1,13 +1,11 @@
 import { copy, ensureDir, ensureFile } from "@std/fs";
 import { join, parse } from "@std/path";
 
-import { BlogPost } from "./blogPosts.ts";
 import { renderMD } from "./exts/md.ts";
 import { renderHTML } from "./exts/html.ts";
-import { Gomi } from "./gomi.ts";
-import { StaticFile } from "./staticFiles.ts";
+import { Gomi, ContentUnit } from "./gomi.ts";
 
-export const compileFile = async (file: BlogPost | StaticFile, gomi: Gomi) => {
+export const compileFile = async (file: ContentUnit, gomi: Gomi) => {
   const outputFilePath = join(Gomi.outputDir, file.url);
   const { dir: outputPath } = parse(outputFilePath);
   await ensureDir(outputPath);
@@ -22,22 +20,19 @@ export const compileFile = async (file: BlogPost | StaticFile, gomi: Gomi) => {
     case ".md": {
       const md = await renderMD(file);
 
-      content = gomi.layouts.use(md.content, file.input);
+      content = gomi.layouts.use(md, file.input);
       variables = {
         ...variables,
-        page: { ...md.frontmatter, ...file.meta },
-        content: md.content,
+        page: { ...file.meta },
+        content: md,
       };
 
       break;
     }
 
     case ".html": {
-      console.log(file);
       const f = await Deno.readTextFile(file.input);
-      // const layout = gomi.layouts.for(file.input);
       content = gomi.layouts.use(f, file.input);
-      console.log(f);
 
       break;
     }
