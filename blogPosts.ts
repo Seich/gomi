@@ -1,4 +1,4 @@
-import { format, parse } from "@std/path";
+import { format, join, parse } from "@std/path";
 import { walk } from "@std/fs";
 import { ContentUnit } from "./contentUnit.ts";
 import { readFileWithFrontMatter } from "./files.ts";
@@ -18,7 +18,7 @@ const getBlogPost = async (filepath: string): Promise<ContentUnit> => {
     ext: ".html",
   });
 
-  const url = [...name.split("-").slice(0, 3), filename].join("/");
+  const url = join(...name.split("-").slice(0, 3), filename);
 
   // Read content
   const { body, attrs } = await readFileWithFrontMatter(filepath);
@@ -48,6 +48,6 @@ export const getBlogPosts = async (postsDir: string) => {
   }
 
   return blogPosts.sort((a, b) =>
-    Temporal.PlainDate.compare(b.meta.date, a.meta.date),
+    Temporal.PlainDate.compare(b.meta.date as string, a.meta.date as string),
   );
 };

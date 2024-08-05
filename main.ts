@@ -8,6 +8,7 @@ import { Gomi } from "./gomi.ts";
 const gomi = await Gomi.build();
 
 const compile = debounce(() => {
+  console.log("File changed. Rebuilding...");
   gomi.compile();
 }, 500);
 

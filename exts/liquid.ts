@@ -1,25 +1,14 @@
-import { Liquid } from "https://esm.sh/liquidjs@10.16.1";
+import { Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
+import { Gomi } from "../gomi.ts";
 
-const customTags = null;
+export const renderLiquid = async (
+  content: string,
+  variables: object,
+  gomi: Gomi,
+) => {
+  const engine = new Liquid({});
+  gomi.plugins.forEach((p) => p(engine, Tokenizer));
 
-export const renderLiquid = async (content: string, variables: object) => {
-  const engine = new Liquid();
-  engine.registerTag("image", {
-    parse: function (tagToken: TagToken, remainTokens: TopLevelToken[]) {},
-    render: function* (ctx: Context) {},
-  });
-  engine.registerTag("video", {
-    parse: function (tagToken: TagToken, remainTokens: TopLevelToken[]) {},
-    render: function* (ctx: Context) {},
-  });
-  engine.registerTag("flickr", {
-    parse: function (tagToken: TagToken, remainTokens: TopLevelToken[]) {},
-    render: function* (ctx: Context) {},
-  });
-  engine.registerTag("endflickr", {
-    parse: function (tagToken: TagToken, remainTokens: TopLevelToken[]) {},
-    render: function* (ctx: Context) {},
-  });
   const f = await engine.parseAndRender(content, variables);
 
   return f;

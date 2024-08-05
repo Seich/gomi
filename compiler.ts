@@ -21,13 +21,15 @@ export const compileFile = async (file: ContentUnit, gomi: Gomi) => {
       content = gomi.layouts.use(await renderMD(file), file.input);
       variables = {
         ...variables,
-        page: { ...file.meta },
+        page: { ...file },
+        post: { ...file.meta },
         content,
       };
 
       break;
     }
 
+    case ".xml":
     case ".html": {
       const { body } = await readFileWithFrontMatter(file.input);
       content = gomi.layouts.use(body, file.input);
@@ -48,11 +50,12 @@ export const compileFile = async (file: ContentUnit, gomi: Gomi) => {
       return copy(file.input, outputFilePath, { overwrite: true });
     }
   }
+
   const outputFilePath = join(Gomi.outputDir, file.url);
   const { dir: outputPath } = parse(outputFilePath);
   await ensureDir(outputPath);
   await ensureFile(outputFilePath);
 
-  content = await renderLiquid(content, variables);
+  content = await renderLiquid(content, variables, gomi);
   await Deno.writeTextFile(outputFilePath, content);
 };

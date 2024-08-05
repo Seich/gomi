@@ -3,7 +3,7 @@ export type ContentUnit = {
   filename: string;
   input: string;
   ext: string;
-  meta: object;
+  meta: Record<string, unknown>;
 } & (
   | {
       type: "blogPost";
