@@ -1,11 +1,11 @@
 import { format, parse } from "@std/path";
-import { test as frontmatterPresent, extractYaml } from "@std/front-matter";
 import { walk } from "@std/fs";
-import { ContentUnit } from "./gomi.ts";
+import { ContentUnit } from "./contentUnit.ts";
+import { readFileWithFrontMatter } from "./files.ts";
 
-const getBlogPost = async (input: string): Promise<ContentUnit> => {
+const getBlogPost = async (filepath: string): Promise<ContentUnit> => {
   // Parse filename
-  const { name, ext } = parse(input);
+  const { name, ext } = parse(filepath);
 
   const nameComponents = name.split("-");
   const dateComponents = nameComponents.splice(0, 3).map((v) => parseInt(v));
@@ -21,21 +21,13 @@ const getBlogPost = async (input: string): Promise<ContentUnit> => {
   const url = [...name.split("-").slice(0, 3), filename].join("/");
 
   // Read content
-  const fileContent = await Deno.readTextFile(input);
-  let body = fileContent;
-  let attrs: Record<string, string> = {};
-
-  if (frontmatterPresent(fileContent)) {
-    const frontmatter = extractYaml<Record<string, string>>(fileContent);
-    body = frontmatter.body;
-    attrs = frontmatter.attrs;
-  }
+  const { body, attrs } = await readFileWithFrontMatter(filepath);
 
   return {
     type: "blogPost",
     filename,
     url,
-    input,
+    input: filepath,
     ext,
     meta: { date: date.toString(), ...attrs },
     content: body,

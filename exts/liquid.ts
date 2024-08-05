@@ -2,7 +2,7 @@ import { Liquid } from "https://esm.sh/liquidjs@10.16.1";
 
 const customTags = null;
 
-export const renderHTML = async (content: string, variables: object) => {
+export const renderLiquid = async (content: string, variables: object) => {
   const engine = new Liquid();
   engine.registerTag("image", {
     parse: function (tagToken: TagToken, remainTokens: TopLevelToken[]) {},

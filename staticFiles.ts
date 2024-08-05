@@ -1,6 +1,6 @@
 import { walk } from "@std/fs";
 import { parse } from "@std/path";
-import { ContentUnit } from "./gomi.ts";
+import { ContentUnit } from "./contentUnit.ts";
 
 const getStaticFile = (input: string, url: string): ContentUnit => {
   const { base, ext } = parse(input);

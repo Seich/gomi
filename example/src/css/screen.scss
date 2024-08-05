@@ -1,7 +1,3 @@
----
----
-
-
 $primary: #971717;
 
 /* General */
@@ -25,8 +21,14 @@ a {
   }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans",
+    source-sans-pro, sans-serif;
 }
 
 /* Top */
@@ -177,7 +179,6 @@ article {
   min-width: 500px;
   max-width: 800px;
 
-
   h2 {
     font-size: 24px;
     font-weight: 600;
@@ -219,7 +220,8 @@ article {
   }
 
   code {
-    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+      Consolas, "DejaVu Sans Mono", monospace;
   }
 
   p code,
@@ -430,48 +432,47 @@ section.fourOfour {
 }
 
 @media (prefers-color-scheme: dark) {
- body {
-   background: #202020;
-   color: #f9e2f0;
- }
- 
- blockquote {
-   background: #292929!important;
- }
+  body {
+    background: #202020;
+    color: #f9e2f0;
+  }
 
- a {
-   color: #ee6d6d;
- }
+  blockquote {
+    background: #292929 !important;
+  }
 
- #top h1 span {
-   color: #ee6d6d;
- }
+  a {
+    color: #ee6d6d;
+  }
 
- header h1 a {
-   color: #f9e2f0;
- }
+  #top h1 span {
+    color: #ee6d6d;
+  }
 
- header aside {
-   color: #d0b9b9;
- }
+  header h1 a {
+    color: #f9e2f0;
+  }
 
- #top h1 a {
-  color: #f9e2f0;
- }
+  header aside {
+    color: #d0b9b9;
+  }
 
- .highlighter-rouge {
-   filter: invert(1);
- }
+  #top h1 a {
+    color: #f9e2f0;
+  }
 
- code {
-   color: black;
- }
+  .highlighter-rouge {
+    filter: invert(1);
+  }
 
- footer {
-  background: #2b2a2a;
- }
+  code {
+    color: black;
+  }
+
+  footer {
+    background: #2b2a2a;
+  }
 }
-
 
 div.highlighter-rouge {
   background: #f4f4f4;
@@ -480,7 +481,6 @@ div.highlighter-rouge {
   margin: 1.8em 0;
   overflow-x: auto;
 }
-
 
 .highlight {
   -webkit-text-size-adjust: none;

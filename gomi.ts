@@ -4,24 +4,8 @@ import { getBlogPosts } from "./blogPosts.ts";
 import { getStaticFiles } from "./staticFiles.ts";
 import { compileFile } from "./compiler.ts";
 import { LayoutStore } from "./layouts.ts";
+import { ContentUnit } from "./contentUnit.ts";
 
-export type ContentUnit = {
-  url: string;
-  filename: string;
-  input: string;
-  ext: string;
-} & (
-  | {
-      type: "blogPost";
-      content: string;
-      meta: {
-        date: string;
-      };
-    }
-  | {
-      type: "staticFile";
-    }
-);
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
