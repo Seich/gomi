@@ -1,11 +1,12 @@
-import { resolve } from "@std/path";
 import { ensureDirSync, existsSync } from "@std/fs";
+import { resolve } from "@std/path";
+
 import { getBlogPosts } from "./blogPosts.ts";
-import { getStaticFiles } from "./staticFiles.ts";
 import { compileFile } from "./compiler.ts";
-import { LayoutStore } from "./layouts.ts";
 import { ContentUnit } from "./contentUnit.ts";
+import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
+import { getStaticFiles } from "./staticFiles.ts";
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
@@ -58,11 +59,10 @@ export class Gomi {
 
   async compile() {
     // TODO: accept file changes to rebuild only that file
-    await Promise.all(
-      [...this.posts, ...this.staticFiles].map((file) =>
-        compileFile(file, this),
-      ),
-    );
+    const units = [...this.posts, ...this.staticFiles];
+    for await (const file of units) {
+      compileFile(file, this);
+    }
     console.log("Site built.");
   }
 }

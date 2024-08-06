@@ -12,7 +12,7 @@ const video = (engine: Liquid, tokenizer: Tokenizer) => {
         .split("/")
         .join("-");
 
-      return ` <video playsinline muted="muted" autoplay="autoplay" preload="auto" loop="loop">
+      return ` <video playsinline="" muted="muted" autoplay="autoplay" preload="auto" loop="loop">
     <source
         src="/files/${path}/${this.filename}"
         type="video/mp4" />

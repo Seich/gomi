@@ -55,6 +55,6 @@ The dip switches are fairly straight forward, I just kept everything off. So jus
 
 This plotter was surprisingly easy to setup. Its worked almost entirely out of the box. Had I bought the correct adapter from the start it would have been a 5 minute affair rather than an hour long one.
 
-<video playsinline muted="muted" autoplay="autoplay" preload="auto" loop="loop">
+<video playsinline="" muted="muted" autoplay="autoplay" preload="auto" loop="loop">
     <source src="/files/2019-10-25-notes-on-a-roland-dxy-1150/plotter-working.mp4" type="video/mp4">
 </video>

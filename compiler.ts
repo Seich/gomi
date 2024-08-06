@@ -9,31 +9,34 @@ import { ContentUnit } from "./contentUnit.ts";
 import { readFileWithFrontMatter } from "./files.ts";
 
 export const compileFile = async (file: ContentUnit, gomi: Gomi) => {
-  let content = "";
+  let content: string = "";
   let variables: Record<string, string | object> = {
     site: {
       posts: gomi.posts,
     },
+    page: { ...file },
   };
 
   switch (file.ext) {
     case ".md": {
-      content = gomi.layouts.use(await renderMD(file), file.input);
       variables = {
         ...variables,
-        page: { ...file },
         post: { ...file.meta },
         content,
       };
+
+      content = gomi.layouts.use(await renderMD(file), file.input);
 
       break;
     }
 
     case ".xml":
     case ".html": {
-      const { body } = await readFileWithFrontMatter(file.input);
-      content = gomi.layouts.use(body, file.input);
-
+      const { body, attrs } = await readFileWithFrontMatter(file.input);
+      content = await renderLiquid(body, variables, gomi);
+      if (attrs) {
+        content = gomi.layouts.use(content, file.input);
+      }
       break;
     }
 

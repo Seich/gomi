@@ -9,7 +9,10 @@ export const renderLiquid = async (
   const engine = new Liquid({});
   gomi.plugins.forEach((p) => p(engine, Tokenizer));
 
-  const f = await engine.parseAndRender(content, variables);
-
-  return f;
+  try {
+    const f = await engine.parseAndRender(content, variables);
+    return f;
+  } catch (e) {
+    console.log(e);
+  }
 };

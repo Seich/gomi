@@ -7,7 +7,7 @@ I recently added an HP6236B to my small but ever-growing vintage test equipment
 collection. It was in amazing condition when shipped but got smashed quite a bit
 on its way to me. The initial test wasn't promising:
 
-<video playsinline muted="muted" autoplay="autoplay" preload="auto" loop="loop">
+<video playsinline="" muted="muted" autoplay="autoplay" preload="auto" loop="loop">
     <source src="/files/2018-02-14-hardware-debugging-hp6236b/initial%20test.mp4" type="video/mp4">
 </video>
 
@@ -40,7 +40,7 @@ I went ahead and removed them, replacing C1 with the closest capacitor I could
 find, a 220µF one. It was close enough. The power supply came to life and
 started working _almost_ as intended.
 
-<video playsinline muted="muted" autoplay="autoplay" preload="auto" loop="loop">
+<video playsinline="" muted="muted" autoplay="autoplay" preload="auto" loop="loop">
     <source src="/files/2018-02-14-hardware-debugging-hp6236b/initial%20working.mp4" type="video/mp4">
 </video>
 
@@ -59,7 +59,7 @@ Once all the pieces were in, I resoldered the meters, placed everything back
 together and closed it up. I did some load testing and calibration using my
 Kikusui PLZ72w and it was good to go.
 
-<video playsinline muted="muted" autoplay="autoplay" preload="auto" loop="loop">
+<video playsinline="" muted="muted" autoplay="autoplay" preload="auto" loop="loop">
     <source src="/files/2018-02-14-hardware-debugging-hp6236b/final%20working.mp4" type="video/mp4">
 </video>
 
