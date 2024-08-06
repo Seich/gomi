@@ -1,8 +1,8 @@
 import { ensureDirSync, existsSync } from "@std/fs";
 import { resolve } from "@std/path";
 
-import { getBlogPosts } from "./blogPosts.ts";
-import { compileFile } from "./compiler.ts";
+import { BlogPost } from "./BlogPost.ts";
+import { writePost } from "./writePost.ts";
 import { ContentUnit } from "./contentUnit.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
@@ -14,13 +14,13 @@ export class Gomi {
   static postsDir = resolve(this.inputDir, "_posts");
   static pluginsDir = resolve(this.inputDir, "_plugins");
 
-  posts: ContentUnit[] = [];
+  posts: BlogPost[] = [];
   staticFiles: ContentUnit[] = [];
   plugins: Plugin[];
   layouts: LayoutStore;
 
   constructor(
-    posts: ContentUnit[],
+    posts: BlogPost[],
     staticFiles: ContentUnit[],
     layouts: LayoutStore,
     plugins: Plugin[],
@@ -34,6 +34,7 @@ export class Gomi {
     console.log(`OUTPUT = ${Gomi.outputDir}`);
     console.log(`INPUT = ${Gomi.inputDir}`);
     console.log(`POSTS = ${Gomi.postsDir} (${posts.length})`);
+    console.log(`PLUGINS = ${Gomi.pluginsDir} (${plugins.length})`);
     console.log(`===========================`);
 
     this.posts = posts;
@@ -49,7 +50,7 @@ export class Gomi {
 
     const layouts = await LayoutStore.build(Gomi.inputDir);
     const plugins = await getPlugins(Gomi.pluginsDir);
-    const blogPosts = await getBlogPosts(Gomi.postsDir);
+    const blogPosts = await BlogPost.loadAll(Gomi.postsDir);
     const staticFiles = await getStaticFiles(Gomi.inputDir);
 
     ensureDirSync(Gomi.outputDir);
@@ -58,11 +59,10 @@ export class Gomi {
   }
 
   async compile() {
-    // TODO: accept file changes to rebuild only that file
-    const units = [...this.posts, ...this.staticFiles];
-    for await (const file of units) {
-      compileFile(file, this);
+    for await (const post of this.posts) {
+      writePost(post, this);
     }
+
     console.log("Site built.");
   }
 }

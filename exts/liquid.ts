@@ -1,13 +1,11 @@
 import { Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
 import { Gomi } from "../gomi.ts";
+import { getPlugins } from "../plugins.ts";
 
-export const renderLiquid = async (
-  content: string,
-  variables: object,
-  gomi: Gomi,
-) => {
+export const renderLiquid = async (content: string, variables: object) => {
   const engine = new Liquid({});
-  gomi.plugins.forEach((p) => p(engine, Tokenizer));
+  const plugins = await getPlugins(Gomi.pluginsDir);
+  plugins.forEach((p) => p(engine, Tokenizer));
 
   try {
     const f = await engine.parseAndRender(content, variables);

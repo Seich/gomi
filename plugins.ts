@@ -5,12 +5,11 @@ import { Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
 
 export type Plugin = (engine: Liquid, tokenizer: typeof Tokenizer) => void;
 
+const plugins: Plugin[] = [];
 export const getPlugins = async (pluginsDir: string) => {
-  if (!existsSync(pluginsDir)) {
-    return [];
+  if (!existsSync(pluginsDir) || plugins.length > 0) {
+    return plugins;
   }
-
-  const plugins: Plugin[] = [];
 
   const files = walk(pluginsDir, {
     exts: [".liquid.ts"],

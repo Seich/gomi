@@ -5,7 +5,7 @@ const image = (engine: Liquid, tokenizer: Tokenizer) => {
     parse(tagToken) {
       this.params = tagToken.args.match(/(?:[^\s"]+|"[^"]*")+/g);
       this.filename = this.params[0];
-      this.alt = this.params[1];// TODO: Remove outer "'s
+      this.alt = this.params[1].replace(/^"(.+(?="$))"$/, "$1");
     },
     render(ctx) {
       const path = ctx.environments.page.url
