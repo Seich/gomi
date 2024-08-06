@@ -21,6 +21,7 @@
       "jsr:@std/toml@^1.0.0": "jsr:@std/toml@1.0.0",
       "jsr:@std/yaml@^1.0.0": "jsr:@std/yaml@1.0.0",
       "npm:@shikijs/rehype": "npm:@shikijs/rehype@1.12.1",
+      "npm:@types/node": "npm:@types/node@18.16.19",
       "npm:github-slugger@^2.0": "npm:github-slugger@2.0.0",
       "npm:he@^1.2": "npm:he@1.2.0",
       "npm:katex@^0.16": "npm:katex@0.16.11",
@@ -165,6 +166,10 @@
       },
       "@types/ms@0.7.34": {
         "integrity": "sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==",
+        "dependencies": {}
+      },
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
         "dependencies": {}
       },
       "@types/unist@3.0.2": {
