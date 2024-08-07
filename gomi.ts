@@ -2,11 +2,10 @@ import { ensureDirSync, existsSync } from "@std/fs";
 import { resolve } from "@std/path";
 
 import { BlogPost } from "./BlogPost.ts";
-import { writePost } from "./writePost.ts";
-import { ContentUnit } from "./contentUnit.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
-import { getStaticFiles } from "./staticFiles.ts";
+import { StaticFile } from "./staticFiles.ts";
+import { writePost, writeStaticFile } from "./files.ts";
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
@@ -15,13 +14,13 @@ export class Gomi {
   static pluginsDir = resolve(this.inputDir, "_plugins");
 
   posts: BlogPost[] = [];
-  staticFiles: ContentUnit[] = [];
+  staticFiles: StaticFile[] = [];
   plugins: Plugin[];
   layouts: LayoutStore;
 
   constructor(
     posts: BlogPost[],
-    staticFiles: ContentUnit[],
+    staticFiles: StaticFile[],
     layouts: LayoutStore,
     plugins: Plugin[],
   ) {
@@ -48,10 +47,10 @@ export class Gomi {
       throw new Error("Input directory does not exist.");
     }
 
-    const layouts = await LayoutStore.build(Gomi.inputDir);
-    const plugins = await getPlugins(Gomi.pluginsDir);
-    const blogPosts = await BlogPost.loadAll(Gomi.postsDir);
-    const staticFiles = await getStaticFiles(Gomi.inputDir);
+    const plugins = await getPlugins();
+    const layouts = await LayoutStore.build();
+    const blogPosts = await BlogPost.loadAll();
+    const staticFiles = await StaticFile.loadAll();
 
     ensureDirSync(Gomi.outputDir);
 
@@ -61,6 +60,10 @@ export class Gomi {
   async compile() {
     for await (const post of this.posts) {
       writePost(post, this);
+    }
+
+    for await (const file of this.staticFiles) {
+      writeStaticFile(file, this);
     }
 
     console.log("Site built.");

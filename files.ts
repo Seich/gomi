@@ -1,4 +1,11 @@
 import { extractYaml, test as frontmatterPresent } from "@std/front-matter";
+import { ensureDir, ensureFile } from "@std/fs";
+import { join, parse } from "@std/path";
+
+import { BlogPost } from "./BlogPost.ts";
+import { renderLiquid } from "./exts/liquid.ts";
+import { Gomi } from "./gomi.ts";
+import { StaticFile } from "./staticFiles.ts";
 
 export interface ParsedFile {
   url: string;
@@ -23,4 +30,47 @@ export const readFileWithFrontMatter = async (filepath: string) => {
   }
 
   return { body, attrs };
+};
+
+const ensureOutputDir = async (unit: BlogPost | StaticFile) => {
+  const outputFilePath = join(Gomi.outputDir, unit.file.url);
+  const { dir: outputPath } = parse(outputFilePath);
+  await ensureDir(outputPath);
+  await ensureFile(outputFilePath);
+
+  return outputFilePath;
+};
+
+export const writePost = async (unit: BlogPost, gomi: Gomi) => {
+  const outputFilePath = await ensureOutputDir(unit);
+
+  const content = await renderLiquid(
+    gomi.layouts.use(unit.content, unit.file.input.filepath),
+    {
+      site: { posts: gomi.posts },
+      page: { ...unit.file },
+      post: { ...unit.file.meta },
+      content: unit.content,
+    },
+  );
+  await Deno.writeTextFile(outputFilePath, content);
+};
+
+export const writeStaticFile = async (unit: StaticFile, gomi: Gomi) => {
+  if (unit.shouldCopy) return;
+
+  const outputFilePath = await ensureOutputDir(unit);
+
+  const content =
+    unit.file.input.ext === ".html"
+      ? gomi.layouts.use(unit.content, unit.file.input.filepath)
+      : unit.content;
+
+  const output = await renderLiquid(content, {
+    site: { posts: gomi.posts },
+    page: { ...unit.file },
+    post: { ...unit.file.meta },
+    content: unit.content,
+  });
+  await Deno.writeTextFile(outputFilePath, output);
 };

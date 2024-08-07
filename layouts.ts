@@ -1,5 +1,6 @@
 import { walk } from "@std/fs";
-import { dirname, join } from "@std/path";
+import { dirname, join, parse } from "@std/path";
+import { Gomi } from "./gomi.ts";
 
 type LayoutsMap = {
   [key: string]: string;
@@ -8,6 +9,7 @@ type LayoutsMap = {
 export class LayoutStore {
   layouts: LayoutsMap = {};
   inputDir: string = "";
+  static NO_LAYOUT = "{{ content }}";
 
   constructor(inputDir: string, layouts: LayoutsMap) {
     if (!layouts) throw new Error("You meant to call LayoutCalculator.build()");
@@ -19,11 +21,11 @@ export class LayoutStore {
     return layout.replace(/{{\s?content\s?}}/, content);
   }
 
-  static async build(inputDir: string) {
+  static async build() {
     const layouts: LayoutsMap = {};
 
     // Find all layout files and read them.
-    const files = walk(inputDir, {
+    const files = walk(Gomi.inputDir, {
       includeDirs: false,
     });
 
@@ -39,7 +41,7 @@ export class LayoutStore {
       let layout = layouts[path];
       let currentDir = join(path, "..");
 
-      while (currentDir !== join(inputDir, "..")) {
+      while (currentDir !== join(Gomi.inputDir, "..")) {
         if (layouts[currentDir]) {
           layout = LayoutStore.replaceInLayout(layout, layouts[currentDir]);
         }
@@ -49,7 +51,7 @@ export class LayoutStore {
       layouts[path] = layout;
     });
 
-    return new LayoutStore(inputDir, layouts);
+    return new LayoutStore(Gomi.inputDir, layouts);
   }
 
   for(filepath: string) {

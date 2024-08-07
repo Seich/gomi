@@ -1,6 +1,6 @@
-import { Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
+import { Liquid } from "https://esm.sh/liquidjs@10.16.1";
 
-const image = (engine: Liquid, tokenizer: Tokenizer) => {
+const image = (engine: Liquid) => {
   engine.registerTag("image", {
     parse(tagToken) {
       this.params = tagToken.args.match(/(?:[^\s"]+|"[^"]*")+/g);

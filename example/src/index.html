@@ -13,8 +13,8 @@
     <ul>
       {% for post in site.posts limit:6 %}
       <li>
-        <a href="{{ post.url }}">{{ post.meta.title }}</a>
-        <time>{{ post.meta.date | date: "%B %d, %Y"}}</time>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+        <time>{{ post.date | date: "%B %d, %Y" }}</time>
       </li>
       {% endfor %}
     </ul>

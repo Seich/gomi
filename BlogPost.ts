@@ -4,14 +4,23 @@ import { ParsedFile, readFileWithFrontMatter } from "./files.ts";
 import { renderMD } from "./exts/md.ts";
 import { renderLiquid } from "./exts/liquid.ts";
 import { hashString } from "./hash.ts";
+import { Gomi } from "./gomi.ts";
 
 export class BlogPost {
   file: ParsedFile;
-  content: string = "";
-  hash: string = "";
+  content = "";
+  hash = "";
+
+  title = "";
+  date = "";
+  url = "";
 
   constructor(file: ParsedFile) {
     this.file = file;
+
+    this.title = (file.meta?.title as string) ?? "";
+    this.date = (file.meta?.date as string) ?? "";
+    this.url = file.url;
   }
 
   async compile() {
@@ -75,8 +84,8 @@ export class BlogPost {
     return blogPost;
   }
 
-  static async loadAll(postsDir: string) {
-    const files = walk(postsDir, {
+  static async loadAll() {
+    const files = walk(Gomi.postsDir, {
       exts: [".md"],
       includeDirs: false,
       includeSymlinks: false,
