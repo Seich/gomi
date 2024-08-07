@@ -1,6 +1,6 @@
 import { format, join, parse } from "@std/path";
 import { walk } from "@std/fs";
-import { ParsedFile, readFileWithFrontMatter } from "./files.ts";
+import { ParsedFile, readFileWithFrontMatter, writePost } from "./files.ts";
 import { renderMD } from "./exts/md.ts";
 import { renderLiquid } from "./exts/liquid.ts";
 import { hashString } from "./hash.ts";
@@ -37,6 +37,24 @@ export class BlogPost {
     this.hash = hash;
 
     return this.content;
+  }
+
+  async reload() {
+    const { attrs, body } = await readFileWithFrontMatter(
+      this.file.input.filepath,
+    );
+
+    this.file.meta = {
+      ...this.file.meta,
+      ...attrs,
+    };
+
+    this.file.input.content = body;
+    this.compile();
+  }
+
+  async write(gomi: Gomi) {
+    await writePost(this, gomi);
   }
 
   static parseFilename(filepath: string): ParsedFile {

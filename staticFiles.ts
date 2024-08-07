@@ -2,7 +2,11 @@ import { copy, ensureDir, walk } from "@std/fs";
 import { format, join, parse } from "@std/path";
 
 import { renderScss } from "./exts/scss.ts";
-import { ParsedFile, readFileWithFrontMatter } from "./files.ts";
+import {
+  ParsedFile,
+  readFileWithFrontMatter,
+  writeStaticFile,
+} from "./files.ts";
 import { Gomi } from "./gomi.ts";
 import { hashString } from "./hash.ts";
 
@@ -49,6 +53,24 @@ export class StaticFile {
 
     this.hash = hash;
     return this.content;
+  }
+
+  async reload() {
+    const { attrs, body } = this.shouldCopy
+      ? { attrs: {}, body: "" }
+      : await readFileWithFrontMatter(this.file.input.filepath);
+
+    this.file.meta = {
+      ...this.file.meta,
+      ...attrs,
+    };
+
+    this.file.input.content = body;
+    this.compile();
+  }
+
+  async write(gomi: Gomi) {
+    await writeStaticFile(this, gomi);
   }
 
   static async load(filepath: string) {

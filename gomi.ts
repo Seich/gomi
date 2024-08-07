@@ -5,7 +5,6 @@ import { BlogPost } from "./BlogPost.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./staticFiles.ts";
-import { writePost, writeStaticFile } from "./files.ts";
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
@@ -57,13 +56,23 @@ export class Gomi {
     return new Gomi(blogPosts, staticFiles, layouts, plugins);
   }
 
-  async compile() {
-    for await (const post of this.posts) {
-      writePost(post, this);
+  async compile(files?: string[]) {
+    if (files) {
+      for (const file of files) {
+        const unit = [...this.posts, ...this.staticFiles].find(
+          (p) => p.file.input.filepath === file,
+        );
+
+        if (unit) {
+          await unit.reload();
+          await unit.write(this);
+        }
+      }
+      return;
     }
 
-    for await (const file of this.staticFiles) {
-      writeStaticFile(file, this);
+    for await (const unit of [...this.posts, ...this.staticFiles]) {
+      unit.write(this);
     }
 
     console.log("Site built.");
