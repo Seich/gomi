@@ -1174,6 +1174,8 @@
     "https://deno.land/std@0.198.0/path/to_file_url.ts": "dd32f7a01bbf3b15b5df46796659984b372973d9b2d7d59bcf0eb990763a0cb5",
     "https://deno.land/std@0.198.0/path/to_namespaced_path.ts": "4e643ab729bf49ccdc166ad48d2de262ff462938fcf2a44a4425588f4a0bd690",
     "https://deno.land/std@0.198.0/path/win32.ts": "8b3f80ef7a462511d5e8020ff490edcaa0a0d118f1b1e9da50e2916bdd73f9dd",
+    "https://deno.land/std@0.224.0/encoding/_util.ts": "beacef316c1255da9bc8e95afb1fa56ed69baef919c88dc06ae6cb7a6103d376",
+    "https://deno.land/std@0.224.0/encoding/base64.ts": "dd59695391584c8ffc5a296ba82bcdba6dd8a84d41a6a539fbee8e5075286eaf",
     "https://deno.land/x/configuration@0.2.0/deno-configuration.ts": "b3294351b5d31443c683460a94e1072aea1b7927c4ee9312880c104b6ddfb01d",
     "https://deno.land/x/configuration@0.2.0/import-map.ts": "a7ac5c980d0490e62079782c041f20308a399e96f1ac567eb9cddc006a6d66d1",
     "https://deno.land/x/configuration@0.2.0/mod.ts": "1da6b3eabd5ee8ebb2e540c86a7dd952ac075b57ab1e750784b93343b7e90d90",

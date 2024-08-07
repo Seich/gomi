@@ -1,5 +1,5 @@
 import { Liquid } from "https://esm.sh/liquidjs@10.16.1";
-import { encodeBase64 } from "@std/encoding";
+import { encodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 
 const flickr = (engine: Liquid) => {
   const api_key = Deno.env.get("FLICKR_KEY");
