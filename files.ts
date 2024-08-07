@@ -32,6 +32,14 @@ export const readFileWithFrontMatter = async (filepath: string) => {
   return { body, attrs };
 };
 
+const getEnvVariables = () => {
+  const o = Object.entries(Deno.env.toObject())
+    .filter(([key]) => key.startsWith("SITE_"))
+    .map(([key, value]) => [key.replace(/^SITE_/, "").toLowerCase(), value]);
+
+  return Object.fromEntries(o);
+};
+
 const ensureOutputDir = async (unit: BlogPost | StaticFile) => {
   const outputFilePath = join(Gomi.outputDir, unit.file.url);
   const { dir: outputPath } = parse(outputFilePath);
@@ -43,11 +51,12 @@ const ensureOutputDir = async (unit: BlogPost | StaticFile) => {
 
 export const writePost = async (unit: BlogPost, gomi: Gomi) => {
   const outputFilePath = await ensureOutputDir(unit);
+  const env = getEnvVariables();
 
   const content = await renderLiquid(
     gomi.layouts.use(unit.content, unit.file.input.filepath),
     {
-      site: { posts: gomi.posts },
+      site: { posts: gomi.posts, ...env },
       page: { ...unit.file },
       post: { ...unit.file.meta },
       content: unit.content,
@@ -60,6 +69,7 @@ export const writeStaticFile = async (unit: StaticFile, gomi: Gomi) => {
   if (unit.shouldCopy) return;
 
   const outputFilePath = await ensureOutputDir(unit);
+  const env = getEnvVariables();
 
   const content =
     unit.file.input.ext === ".html"
@@ -67,7 +77,7 @@ export const writeStaticFile = async (unit: StaticFile, gomi: Gomi) => {
       : unit.content;
 
   const output = await renderLiquid(content, {
-    site: { posts: gomi.posts },
+    site: { posts: gomi.posts, ...env },
     page: { ...unit.file },
     post: { ...unit.file.meta },
     content: unit.content,
