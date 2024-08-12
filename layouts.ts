@@ -1,6 +1,8 @@
 import { walk } from "@std/fs";
-import { dirname, join, parse } from "@std/path";
+import { dirname, join } from "@std/path";
 import { Gomi } from "./gomi.ts";
+import { BlogPost } from "./BlogPost.ts";
+import { StaticFile } from "./staticFiles.ts";
 
 type LayoutsMap = {
   [key: string]: string;
@@ -64,8 +66,8 @@ export class LayoutStore {
     return this.layouts[path];
   }
 
-  use(content: string, filepath: string) {
-    const layout = this.for(filepath);
-    return LayoutStore.replaceInLayout(content, layout);
+  use(unit: BlogPost | StaticFile) {
+    const layout = this.for(unit.file.input.filepath);
+    return LayoutStore.replaceInLayout(unit.content, layout);
   }
 }

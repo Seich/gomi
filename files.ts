@@ -53,15 +53,12 @@ export const writePost = async (unit: BlogPost, gomi: Gomi) => {
   const outputFilePath = await ensureOutputDir(unit);
   const env = getEnvVariables();
 
-  const content = await renderLiquid(
-    gomi.layouts.use(unit.content, unit.file.input.filepath),
-    {
-      site: { posts: gomi.posts, ...env },
-      page: { ...unit.file },
-      post: { ...unit.file.meta },
-      content: unit.content,
-    },
-  );
+  const content = await renderLiquid(gomi.layouts.use(unit), {
+    site: { posts: gomi.posts, ...env },
+    page: { ...unit.file },
+    post: { ...unit.file.meta },
+    content: unit.content,
+  });
   await Deno.writeTextFile(outputFilePath, content);
 };
 
@@ -72,9 +69,7 @@ export const writeStaticFile = async (unit: StaticFile, gomi: Gomi) => {
   const env = getEnvVariables();
 
   const content =
-    unit.file.input.ext === ".html"
-      ? gomi.layouts.use(unit.content, unit.file.input.filepath)
-      : unit.content;
+    unit.file.input.ext === ".html" ? gomi.layouts.use(unit) : unit.content;
 
   const output = await renderLiquid(content, {
     site: { posts: gomi.posts, ...env },

@@ -6,6 +6,10 @@ export const renderLiquid = async (content: string, variables: object) => {
   const plugins = await getPlugins();
   plugins.forEach((p) => p(engine, Tokenizer));
 
+  engine.registerFilter('dynamic', function(content) {
+    return this.liquid.parseAndRender(content, this.context.getAll())
+  })
+
   try {
     const f = await engine.parseAndRender(content, variables);
     return f;

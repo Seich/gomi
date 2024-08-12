@@ -6,6 +6,8 @@ import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./staticFiles.ts";
 
+const config = await import("./deno.json", { with: { type: "json" } });
+
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
   static inputDir = resolve(Deno.env.get("INPUT") ?? "src");
@@ -27,7 +29,7 @@ export class Gomi {
       throw new Error("You probably meant to use Gomi.build() instead.");
     }
 
-    console.log(`Gomi(ta) v1.0.0`);
+    console.log(`Gomi(ta) v${config.default.version}`);
     console.log(`===========================`);
     console.log(`OUTPUT = ${Gomi.outputDir}`);
     console.log(`INPUT = ${Gomi.inputDir}`);
@@ -67,6 +69,8 @@ export class Gomi {
           await unit.reload();
           await unit.write(this);
         }
+
+        // TODO: handle a new file being added.
       }
       return;
     }

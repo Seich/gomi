@@ -1,5 +1,7 @@
 {
-  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "$schema": "https://raw.githubusercontent.com/denoland/deno/v1.41.0/cli/schemas/config-file.v1.json",
+  "name": "@seich/gomita",
+  "version": "0.1.0",
   "tasks": {},
   "imports": {
     "@deno/gfm": "jsr:@deno/gfm@^0.8.2",
