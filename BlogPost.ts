@@ -1,15 +1,16 @@
+import { existsSync, walk } from "@std/fs";
 import { format, join, parse } from "@std/path";
-import { walk } from "@std/fs";
+
+import { renderLiquid } from "./exts/liquid.ts";
+import { renderMD } from "./exts/md.ts";
 import {
+  FileUnit,
   ParsedFile,
   readFileWithFrontMatter,
   writeFile,
-  FileUnit,
 } from "./files.ts";
-import { renderMD } from "./exts/md.ts";
-import { renderLiquid } from "./exts/liquid.ts";
-import { hashString } from "./hash.ts";
 import { Gomi } from "./gomi.ts";
+import { hashString } from "./hash.ts";
 
 export class BlogPost implements FileUnit {
   file: ParsedFile;
@@ -109,23 +110,27 @@ export class BlogPost implements FileUnit {
   }
 
   static async loadAll() {
-    const files = walk(Gomi.postsDir, {
-      exts: [".md"],
-      includeDirs: false,
-      includeSymlinks: false,
-    });
+    try {
+      const files = walk(Gomi.postsDir, {
+        exts: [".md"],
+        includeDirs: false,
+        includeSymlinks: false,
+      });
 
-    const blogPosts: BlogPost[] = [];
-    for await (const file of files) {
-      const post = await BlogPost.load(file.path);
-      blogPosts.push(post);
+      const blogPosts: BlogPost[] = [];
+      for await (const file of files) {
+        const post = await BlogPost.load(file.path);
+        blogPosts.push(post);
+      }
+
+      return blogPosts.sort((a, b) =>
+        Temporal.PlainDate.compare(
+          b.file.meta.date as string,
+          a.file.meta.date as string,
+        ),
+      );
+    } catch (_) {
+      return [];
     }
-
-    return blogPosts.sort((a, b) =>
-      Temporal.PlainDate.compare(
-        b.file.meta.date as string,
-        a.file.meta.date as string,
-      ),
-    );
   }
 }
