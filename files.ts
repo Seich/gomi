@@ -2,10 +2,8 @@ import { extractYaml, test as frontmatterPresent } from "@std/front-matter";
 import { ensureDir, ensureFile } from "@std/fs";
 import { join, parse } from "@std/path";
 
-import { BlogPost } from "./BlogPost.ts";
 import { renderLiquid } from "./exts/liquid.ts";
 import { Gomi } from "./gomi.ts";
-import { StaticFile } from "./staticFiles.ts";
 
 export interface ParsedFile {
   url: string;
@@ -16,6 +14,13 @@ export interface ParsedFile {
     ext: string;
     content?: string;
   };
+}
+
+export interface FileUnit {
+  file: ParsedFile;
+  shouldCopy: boolean;
+  content: string;
+  hash: string;
 }
 
 export const readFileWithFrontMatter = async (filepath: string) => {
@@ -32,7 +37,7 @@ export const readFileWithFrontMatter = async (filepath: string) => {
   return { body, attrs };
 };
 
-const getEnvVariables = () => {
+export const getEnvVariables = () => {
   const o = Object.entries(Deno.env.toObject())
     .filter(([key]) => key.startsWith("SITE_"))
     .map(([key, value]) => [key.replace(/^SITE_/, "").toLowerCase(), value]);
@@ -40,7 +45,7 @@ const getEnvVariables = () => {
   return Object.fromEntries(o);
 };
 
-const ensureOutputDir = async (unit: BlogPost | StaticFile) => {
+const ensureOutputDir = async (unit: FileUnit) => {
   const outputFilePath = join(Gomi.outputDir, unit.file.url);
   const { dir: outputPath } = parse(outputFilePath);
   await ensureDir(outputPath);
@@ -49,27 +54,12 @@ const ensureOutputDir = async (unit: BlogPost | StaticFile) => {
   return outputFilePath;
 };
 
-export const writePost = async (unit: BlogPost, gomi: Gomi) => {
-  const outputFilePath = await ensureOutputDir(unit);
-  const env = getEnvVariables();
-
-  const content = await renderLiquid(gomi.layouts.use(unit), {
-    site: { posts: gomi.posts, ...env },
-    page: { ...unit.file },
-    post: { ...unit.file.meta },
-    content: unit.content,
-  });
-  await Deno.writeTextFile(outputFilePath, content);
-};
-
-export const writeStaticFile = async (unit: StaticFile, gomi: Gomi) => {
+export const writeFile = async (unit: FileUnit, gomi: Gomi) => {
   if (unit.shouldCopy) return;
 
   const outputFilePath = await ensureOutputDir(unit);
   const env = getEnvVariables();
-
-  const content =
-    unit.file.input.ext === ".html" ? gomi.layouts.use(unit) : unit.content;
+  const content = gomi.layouts.use(unit);
 
   const output = await renderLiquid(content, {
     site: { posts: gomi.posts, ...env },

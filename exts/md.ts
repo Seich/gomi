@@ -6,14 +6,17 @@ import remarkGfm from "npm:remark-gfm";
 import rehypeShiki from "npm:@shikijs/rehype";
 
 export const renderMD = async (content: string) => {
+  const lightTheme = Deno.env.get("SHIKI_THEME_LIGHT") ?? "vitesse-light";
+  const darkTheme = Deno.env.get("SHIKI_THEME_DARK") ?? "vitesse-dark";
+
   const md = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeShiki, {
       themes: {
-        light: "vitesse-light",
-        dark: "vitesse-dark",
+        light: lightTheme,
+        dark: darkTheme,
       },
     })
     .use(rehypeStringify, { allowDangerousHtml: true })

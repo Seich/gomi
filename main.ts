@@ -21,7 +21,7 @@ if (args._.includes("serve")) {
         showDirListing: true,
       }),
   );
-} else if (args._.includes("build")) {
+} else {
   gomi.compile();
 }
 

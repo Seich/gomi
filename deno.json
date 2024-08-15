@@ -2,7 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/denoland/deno/v1.41.0/cli/schemas/config-file.v1.json",
   "name": "@seich/gomita",
   "version": "0.1.0",
-  "tasks": {},
+  "tasks": {
+    "start": "deno run --watch --allow-read --allow-write --allow-env --unstable-temporal --allow-net --allow-sys main.ts serve --watch",
+    "compile": "deno compile --allow-read --allow-write --allow-env --unstable-temporal --allow-net --allow-sys main.ts --output gomi"
+  },
   "imports": {
     "@deno/gfm": "jsr:@deno/gfm@^0.8.2",
     "@std/async": "jsr:@std/async@^1.0.2",

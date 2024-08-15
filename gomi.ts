@@ -5,6 +5,7 @@ import { BlogPost } from "./BlogPost.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./staticFiles.ts";
+import { getEnvVariables } from "./files.ts";
 
 const config = await import("./deno.json", { with: { type: "json" } });
 
@@ -13,6 +14,7 @@ export class Gomi {
   static inputDir = resolve(Deno.env.get("INPUT") ?? "src");
   static postsDir = resolve(this.inputDir, "_posts");
   static pluginsDir = resolve(this.inputDir, "_plugins");
+  static env = getEnvVariables();
 
   posts: BlogPost[] = [];
   staticFiles: StaticFile[] = [];

@@ -1,8 +1,7 @@
 import { walk } from "@std/fs";
 import { dirname, join } from "@std/path";
 import { Gomi } from "./gomi.ts";
-import { BlogPost } from "./BlogPost.ts";
-import { StaticFile } from "./staticFiles.ts";
+import { FileUnit } from "./files.ts";
 
 type LayoutsMap = {
   [key: string]: string;
@@ -66,8 +65,16 @@ export class LayoutStore {
     return this.layouts[path];
   }
 
-  use(unit: BlogPost | StaticFile) {
-    const layout = this.for(unit.file.input.filepath);
-    return LayoutStore.replaceInLayout(unit.content, layout);
+  use(unit: FileUnit): string {
+    // TODO: allow setting layout from frontmatter
+    switch (unit.file.input.ext) {
+      case ".md":
+      case ".html": {
+        const layout = this.for(unit.file.input.filepath);
+        return LayoutStore.replaceInLayout(unit.content, layout);
+      }
+      default:
+        return unit.content;
+    }
   }
 }

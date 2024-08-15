@@ -141,7 +141,7 @@ header {
 
   h1 {
     margin: 0;
-    margin-top: 1em;
+    margin-top: 0.5em;
     padding: 0.2em 0;
     text-align: center;
     font-size: 2.5em;
@@ -155,7 +155,7 @@ header {
 
   aside {
     color: #666;
-    margin-bottom: 2.5em;
+    margin-bottom: 1em;
     text-align: center;
 
     & > *:after {
@@ -220,8 +220,7 @@ article {
   }
 
   code {
-    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
-      Consolas, "DejaVu Sans Mono", monospace;
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
     // font-family: "Berkeley Mono", "Roboto Mono", Menlo, Courier, monospace;
     font-size: 0.8em;
     font-style: normal;
@@ -234,13 +233,16 @@ article {
   ul code {
     font-size: 0.7em;
     padding: 0.2em 0.5em;
-    background: #f5f5f5;
+    background: #0b06067d;
+    border-radius: 5px;
+    color: #fff;
   }
 
   pre {
     padding: 1rem;
     border-radius: 5px;
     background: #0b06067d;
+    overflow-x: auto;
   }
 
   pre code {

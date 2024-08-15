@@ -1,13 +1,19 @@
 import { format, join, parse } from "@std/path";
 import { walk } from "@std/fs";
-import { ParsedFile, readFileWithFrontMatter, writePost } from "./files.ts";
+import {
+  ParsedFile,
+  readFileWithFrontMatter,
+  writeFile,
+  FileUnit,
+} from "./files.ts";
 import { renderMD } from "./exts/md.ts";
 import { renderLiquid } from "./exts/liquid.ts";
 import { hashString } from "./hash.ts";
 import { Gomi } from "./gomi.ts";
 
-export class BlogPost {
+export class BlogPost implements FileUnit {
   file: ParsedFile;
+  shouldCopy = false;
   content = "";
   hash = "";
 
@@ -54,7 +60,7 @@ export class BlogPost {
   }
 
   async write(gomi: Gomi) {
-    await writePost(this, gomi);
+    await writeFile(this, gomi);
   }
 
   static parseFilename(filepath: string): ParsedFile {

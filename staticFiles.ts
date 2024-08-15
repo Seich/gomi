@@ -5,12 +5,13 @@ import { renderScss } from "./exts/scss.ts";
 import {
   ParsedFile,
   readFileWithFrontMatter,
-  writeStaticFile,
+  writeFile,
+  FileUnit,
 } from "./files.ts";
 import { Gomi } from "./gomi.ts";
 import { hashString } from "./hash.ts";
 
-export class StaticFile {
+export class StaticFile implements FileUnit {
   file: ParsedFile;
   content = "";
   hash = "";
@@ -45,8 +46,8 @@ export class StaticFile {
         });
         this.content = renderScss(this.file.input.content ?? "");
         break;
-      case ".xml":
       case ".html":
+      case ".xml":
         this.content = this.file.input.content ?? "";
         break;
     }
@@ -70,7 +71,7 @@ export class StaticFile {
   }
 
   async write(gomi: Gomi) {
-    await writeStaticFile(this, gomi);
+    await writeFile(this, gomi);
   }
 
   static async load(filepath: string) {
