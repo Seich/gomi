@@ -7,7 +7,15 @@ on:
       
 permissions:
   contents: write
-  
+  checks: write
+
+  actions: read
+  issues: read
+  packages: write
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+      
 jobs:
   CompileBinaries:
     runs-on: ubuntu-latest
