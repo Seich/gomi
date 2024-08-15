@@ -147,7 +147,11 @@ Plugins
   if (args.watch) {
     const watcher = Deno.watchFs(Gomi.inputDir);
     for await (const _event of watcher) {
-      gomi.compile(_event.paths);
+      try {
+        gomi.compile(_event.paths);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 }
