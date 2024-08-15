@@ -4,9 +4,7 @@ on:
   release:
     types:
       - created
-      - edited 
-permissions:
-    contents: write
+permissions: write-all
 jobs:
   CompileBinaries:
     runs-on: ubuntu-latest
