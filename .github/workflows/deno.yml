@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  Build:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,3 +24,11 @@ jobs:
 
       - name: Compile
         run: deno task compile
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.6
+        with:
+          name: gomi
+          path: ./gomi
+          if-no-files-found: error
+          retention-days: 1
+          
