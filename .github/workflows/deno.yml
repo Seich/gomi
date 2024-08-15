@@ -5,6 +5,8 @@ on:
     types:
       - created
       - edited 
+permissions:
+    contents: write
 jobs:
   CompileBinaries:
     runs-on: ubuntu-latest
