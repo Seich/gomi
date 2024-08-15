@@ -39,6 +39,7 @@ jobs:
         run: TARGET=aarch64-unknown-linux-gnu deno task compile
       - name: Compile x86_64-pc-windows-msvc
         run: TARGET=x86_64-pc-windows-msvc deno task compile
+
   
       - name: Upload release binaries
         uses: alexellis/upload-assets@0.4.0
