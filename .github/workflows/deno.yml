@@ -4,6 +4,7 @@ on:
   release:
     types:
       - created
+      - edited 
 jobs:
   CompileBinaries:
     runs-on: ubuntu-latest
