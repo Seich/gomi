@@ -32,8 +32,10 @@ jobs:
       - name: Compile x86_64-pc-windows-msvc
         run: TARGET=x86_64-pc-windows-msvc deno task compile
   
-      - uses: AButler/upload-release-assets@v3.0
+      - name: Upload release binaries
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          files: "./gomi-*"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          asset_paths: '["./gomi-*"]'
           
