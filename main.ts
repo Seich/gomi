@@ -18,7 +18,6 @@ async function main() {
   if (args.help) {
     console.log(`
 Gomi(ta) a small static site generator.
-Docs: https://gomi.alchem.ee
 Bugs: https://github.com/seich/gomi/issues
 
 To build the site:
@@ -119,9 +118,6 @@ Plugins
     export default hello;
   
   More information is available here: https://liquidjs.com/tutorials/register-filters-tags.html
-
-  
-
 `);
     return;
   }
