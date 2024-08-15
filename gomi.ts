@@ -2,10 +2,10 @@ import { ensureDirSync, existsSync } from "@std/fs";
 import { resolve } from "@std/path";
 
 import { BlogPost } from "./BlogPost.ts";
+import { getEnvVariables } from "./files.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./staticFiles.ts";
-import { getEnvVariables } from "./files.ts";
 
 const config = await import("./deno.json", { with: { type: "json" } });
 
@@ -15,6 +15,7 @@ export class Gomi {
   static postsDir = resolve(this.inputDir, "_posts");
   static pluginsDir = resolve(this.inputDir, "_plugins");
   static env = getEnvVariables();
+  static version = config.default.version;
 
   posts: BlogPost[] = [];
   staticFiles: StaticFile[] = [];
@@ -31,7 +32,7 @@ export class Gomi {
       throw new Error("You probably meant to use Gomi.build() instead.");
     }
 
-    console.log(`Gomi(ta) v${config.default.version}`);
+    console.log(`Gomi(ta) v${Gomi.version}`);
     console.log(`===========================`);
     console.log(`OUTPUT = ${Gomi.outputDir}`);
     console.log(`INPUT = ${Gomi.inputDir}`);
@@ -70,6 +71,7 @@ export class Gomi {
         if (unit) {
           await unit.reload();
           await unit.write(this);
+          console.log(`${unit.file.input.filepath} rebuilt.`);
         }
 
         // TODO: handle a new file being added.
