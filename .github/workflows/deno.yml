@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  Compile Binaries:
+  CompileBinaries:
     runs-on: ubuntu-latest
 
     steps:
