@@ -4,10 +4,6 @@ on:
   release:
     types:
       - created
-
-permissions:
-  contents: read
-
 jobs:
   CompileBinaries:
     runs-on: ubuntu-latest
