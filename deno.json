@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/denoland/deno/v1.41.0/cli/schemas/config-file.v1.json",
   "version": "0.1.0",
   "tasks": {
-    "start": "deno run --watch --allow-read --allow-write --allow-env --unstable-temporal --allow-net --allow-sys main.ts",
+    "start": "deno run --watch --allow-read --allow-write --allow-env --unstable-temporal --allow-net --allow-sys --allow-run main.ts serve",
     "compile": "deno compile --target=$TARGET --allow-read --allow-write --allow-env --unstable-temporal --allow-net --allow-sys --output gomi-$TARGET main.ts"
   },
   "imports": {
