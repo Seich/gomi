@@ -22,13 +22,22 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Compile
-        run: deno task compile
+      - name: Compile aarch64-apple-darwin
+        run: TARGET=aarch64-apple-darwin deno task compile
+      - name: Compile x86_64-apple-darwin
+        run: TARGET=x86_64-apple-darwin deno task compile
+      - name: Compile x86_64-unknown-linux-gnu
+        run: TARGET=x86_64-unknown-linux-gnu deno task compile
+      - name: Compile aarch64-unknown-linux-gnu
+        run: TARGET=aarch64-unknown-linux-gnu deno task compile
+      - name: Compile x86_64-pc-windows-msvc
+        run: TARGET=x86_64-pc-windows-msvc deno task compile
+  
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.6
         with:
-          name: gomi
-          path: ./gomi
+          name: gomi*
+          path: ./gomi*
           if-no-files-found: error
           retention-days: 1
           
