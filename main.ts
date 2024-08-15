@@ -12,7 +12,7 @@ if (args._.includes("serve")) {
 
   Deno.serve(
     {
-      port: parseInt(Deno.env.get("PORT") ?? "8000"),
+      port: parseInt(Deno.env.get("PORT") ?? "0"),
     },
     (req) =>
       serveDir(req, {
