@@ -18,6 +18,7 @@ export const getPlugins = async () => {
   });
 
   for await (const file of files) {
+    console.log(`Loading: ${file.path}`);
     const plugin = await importString(await Deno.readTextFile(file.path));
     plugins.push(plugin.default);
   }
