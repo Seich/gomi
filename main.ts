@@ -22,7 +22,7 @@ if (args._.includes("serve")) {
       }),
   );
 } else {
-  gomi.compile();
+  await gomi.compile();
 }
 
 if (args.watch) {

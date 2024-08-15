@@ -11,3 +11,4 @@ devenv.local.nix
 
 .env
 example/output
+example/
