@@ -1,16 +1,23 @@
 name: Build Gomi
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-
+  release:
+    types:
+      - created
+      
 permissions:
-  contents: read
+  contents: write
+  checks: write
 
+  actions: read
+  issues: read
+  packages: write
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+      
 jobs:
-  Build:
+  CompileBinaries:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,13 +29,22 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Compile
-        run: deno task compile
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4.3.6
+      - name: Compile aarch64-apple-darwin
+        run: TARGET=aarch64-apple-darwin deno task compile
+      - name: Compile x86_64-apple-darwin
+        run: TARGET=x86_64-apple-darwin deno task compile
+      - name: Compile x86_64-unknown-linux-gnu
+        run: TARGET=x86_64-unknown-linux-gnu deno task compile
+      - name: Compile aarch64-unknown-linux-gnu
+        run: TARGET=aarch64-unknown-linux-gnu deno task compile
+      - name: Compile x86_64-pc-windows-msvc
+        run: TARGET=x86_64-pc-windows-msvc deno task compile
+
+  
+      - name: Upload release binaries
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          name: gomi
-          path: ./gomi
-          if-no-files-found: error
-          retention-days: 1
+          asset_paths: '["./gomi-*"]'
           
