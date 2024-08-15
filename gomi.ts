@@ -1,4 +1,4 @@
-import { ensureDirSync, existsSync } from "@std/fs";
+import { ensureDir, existsSync } from "@std/fs";
 import { resolve } from "@std/path";
 
 import { BlogPost } from "./BlogPost.ts";
@@ -56,7 +56,7 @@ export class Gomi {
     const blogPosts = await BlogPost.loadAll();
     const staticFiles = await StaticFile.loadAll();
 
-    ensureDirSync(Gomi.outputDir);
+    await ensureDir(Gomi.outputDir);
 
     return new Gomi(blogPosts, staticFiles, layouts, plugins);
   }
@@ -80,7 +80,7 @@ export class Gomi {
     }
 
     for await (const unit of [...this.posts, ...this.staticFiles]) {
-      unit.write(this);
+      await unit.write(this);
     }
 
     console.log("Site built.");

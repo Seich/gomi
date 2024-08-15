@@ -1,5 +1,5 @@
 import { existsSync, walk } from "@std/fs";
-import { importString } from "https://deno.land/x/import@0.2.1/mod.ts";
+import { importString } from "https://esm.sh/gh/Seich/import@aebd064ffe3/mod.ts";
 import { Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
 import { Gomi } from "./gomi.ts";
 
@@ -18,7 +18,6 @@ export const getPlugins = async () => {
   });
 
   for await (const file of files) {
-    console.log(`Loading: ${file.path}`);
     const plugin = await importString(await Deno.readTextFile(file.path));
     plugins.push(plugin.default);
   }

@@ -69,6 +69,7 @@ Environment Variables:
 
   const gomi = await Gomi.build();
   await gomi.compile();
+
   if (args._.includes("serve")) {
     Deno.serve(
       {
@@ -91,4 +92,4 @@ Environment Variables:
   }
 }
 
-await main();
+main();

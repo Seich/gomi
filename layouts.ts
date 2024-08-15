@@ -37,6 +37,11 @@ export class LayoutStore {
       layouts[dir] = content;
     }
 
+    // If there's no root layout, set a blank one
+    if (typeof layouts[Gomi.inputDir] === "undefined") {
+      layouts[Gomi.inputDir] = "{{ content }}";
+    }
+
     // Embed layouts within their parents all the way to the input root
     Object.keys(layouts).forEach((path) => {
       let layout = layouts[path];
