@@ -49,14 +49,14 @@ Environment Variables:
 
     PORT
         The port the server should run on, if not set a random port is chosen.
-    INPUT
-        The directory to build. 
+    INPUT 
+        The directory to build. Defaults to ./src
     OUTPUT
-        The directory where the build result will be placed.
+        The directory where the build result will be placed. Defaults to ./output
     SHIKI_THEME_DARK
-        The syntax highlighter colorscheme to user for a dark theme.
+        The syntax highlighter colorscheme to user for a dark theme. Defaults to vitesse-dark
     SHIKI_THEME_LIGHT
-        The syntax highlighter colorscheme to user for a light theme.
+        The syntax highlighter colorscheme to user for a light theme. Defaults to vitesse-light
     SITE_*
         Any environment variable starting with SITE_ will be available when building 
         to the templates.

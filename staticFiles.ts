@@ -56,18 +56,23 @@ export class StaticFile implements FileUnit {
     return this.content;
   }
 
-  async reload() {
-    const { attrs, body } = this.shouldCopy
-      ? { attrs: {}, body: "" }
-      : await readFileWithFrontMatter(this.file.input.filepath);
+  async reload(gomi: Gomi) {
+    try {
+      const { attrs, body } = this.shouldCopy
+        ? { attrs: {}, body: "" }
+        : await readFileWithFrontMatter(this.file.input.filepath);
 
-    this.file.meta = {
-      ...this.file.meta,
-      ...attrs,
-    };
+      this.file.meta = {
+        ...this.file.meta,
+        ...attrs,
+      };
 
-    this.file.input.content = body;
-    this.compile();
+      this.file.input.content = body;
+      await this.compile();
+      await this.write(gomi);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async write(gomi: Gomi) {

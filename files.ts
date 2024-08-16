@@ -16,6 +16,8 @@ export interface ParsedFile {
   };
 }
 
+// TODO: include methods here as well
+// reload, write, etc.
 export interface FileUnit {
   file: ParsedFile;
   shouldCopy: boolean;

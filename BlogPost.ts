@@ -1,4 +1,4 @@
-import { existsSync, walk } from "@std/fs";
+import { walk } from "@std/fs";
 import { format, join, parse } from "@std/path";
 
 import { renderLiquid } from "./exts/liquid.ts";
@@ -46,18 +46,23 @@ export class BlogPost implements FileUnit {
     return this.content;
   }
 
-  async reload() {
-    const { attrs, body } = await readFileWithFrontMatter(
-      this.file.input.filepath,
-    );
+  async reload(gomi: Gomi) {
+    try {
+      const { attrs, body } = await readFileWithFrontMatter(
+        this.file.input.filepath,
+      );
 
-    this.file.meta = {
-      ...this.file.meta,
-      ...attrs,
-    };
+      this.file.meta = {
+        ...this.file.meta,
+        ...attrs,
+      };
 
-    this.file.input.content = body;
-    this.compile();
+      this.file.input.content = body;
+      this.compile();
+      this.write(gomi);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async write(gomi: Gomi) {

@@ -35,7 +35,7 @@ export class Gomi {
     console.log(`Gomi(ta) v${Gomi.version}`);
     console.log(`===========================`);
     console.log(`OUTPUT = ${Gomi.outputDir}`);
-    console.log(`INPUT = ${Gomi.inputDir}`);
+    console.log(`INPUT = ${Gomi.inputDir} (${staticFiles.length})`);
     console.log(`POSTS = ${Gomi.postsDir} (${posts.length})`);
     console.log(`PLUGINS = ${Gomi.pluginsDir} (${plugins.length})`);
     console.log(`===========================`);
@@ -69,8 +69,7 @@ export class Gomi {
         );
 
         if (unit) {
-          await unit.reload();
-          await unit.write(this);
+          await unit.reload(this);
           console.log(`${unit.file.input.filepath} rebuilt.`);
         }
 
