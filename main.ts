@@ -2,11 +2,13 @@ import "@std/dotenv/load";
 
 import { parseArgs } from "@std/cli";
 import { serveDir } from "@std/http";
+
 import { Gomi } from "./gomi.ts";
+import { serveGomita } from "./server.ts";
 
 async function main() {
   const args = parseArgs(Deno.args, {
-    boolean: ["watch", "version", "help"],
+    boolean: ["watch", "hot", "version", "help"],
 
     alias: {
       version: "v",
@@ -135,20 +137,19 @@ Plugins
       {
         port: parseInt(Deno.env.get("PORT") ?? "0"),
       },
-      (req) =>
-        serveDir(req, {
-          fsRoot: Gomi.outputDir,
-          showIndex: true,
-          showDirListing: true,
-        }),
+      serveGomita(gomi),
     );
+  }
+
+  if (args.hot) {
+    gomi.emitEvents();
   }
 
   if (args.watch) {
     const watcher = Deno.watchFs(Gomi.inputDir);
     for await (const _event of watcher) {
       try {
-        gomi.compile(_event.paths);
+        await gomi.compile(_event.paths);
       } catch (e) {
         console.log(e);
       }
