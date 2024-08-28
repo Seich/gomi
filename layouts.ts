@@ -19,7 +19,10 @@ export class LayoutStore {
   }
 
   static replaceInLayout(content: string, layout: string) {
-    return layout.replace(/{{\s?content\s?}}/, content);
+    return layout.replace(
+      /{{\s?content\s?}}/,
+      `{% raw %}${content}{% endraw %}`,
+    );
   }
 
   static async build() {

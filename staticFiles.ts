@@ -2,6 +2,7 @@ import { copy, ensureDir, walk } from "@std/fs";
 import { format, join, parse } from "@std/path";
 
 import { renderScss } from "./exts/scss.ts";
+import { renderMD } from "./exts/md.ts";
 import {
   ParsedFile,
   readFileWithFrontMatter,
@@ -29,13 +30,18 @@ export class StaticFile implements FileUnit {
     // TODO: Hash file and don't copy again
     if (this.shouldCopy) {
       await ensureDir(dir);
-      return copy(this.file.input.filepath, outputFilePath, {
+      await copy(this.file.input.filepath, outputFilePath, {
         overwrite: true,
       });
+      return;
     }
 
     const hash = await hashString(this.file.input?.content ?? "");
-    if (hash === this.hash) return this.content;
+    if (hash === this.hash) return;
+    if (!this.file.input.content) {
+      this.content = "";
+      return;
+    }
 
     switch (this.file.input.ext) {
       case ".scss":
@@ -44,16 +50,23 @@ export class StaticFile implements FileUnit {
           ext: ".css",
           base: "",
         });
-        this.content = renderScss(this.file.input.content ?? "");
+        this.content = renderScss(this.file.input.content);
         break;
       case ".html":
       case ".xml":
-        this.content = this.file.input.content ?? "";
+        this.content = this.file.input.content;
+        break;
+      case ".md":
+        this.file.url = format({
+          ...parse(this.file.url),
+          ext: ".html",
+          base: "",
+        });
+        this.content = await renderMD(this.file.input.content);
         break;
     }
 
     this.hash = hash;
-    return this.content;
   }
 
   async reload(gomi: Gomi) {
@@ -81,7 +94,7 @@ export class StaticFile implements FileUnit {
 
   static async load(filepath: string) {
     const { base, ext } = parse(filepath);
-    const shouldCopy = ![".html", ".xml", ".scss"].includes(ext);
+    const shouldCopy = ![".html", ".xml", ".scss", ".md"].includes(ext);
     const { attrs, body } = shouldCopy
       ? { attrs: {}, body: "" }
       : await readFileWithFrontMatter(filepath);

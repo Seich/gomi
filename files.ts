@@ -16,13 +16,15 @@ export interface ParsedFile {
   };
 }
 
-// TODO: include methods here as well
-// reload, write, etc.
 export interface FileUnit {
   file: ParsedFile;
   shouldCopy: boolean;
   content: string;
   hash: string;
+
+  compile(): Promise<void>;
+  write(gomi: Gomi): Promise<void>;
+  reload(gomi: Gomi): Promise<void>;
 }
 
 export const readFileWithFrontMatter = async (filepath: string) => {

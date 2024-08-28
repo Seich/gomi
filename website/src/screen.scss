@@ -1,0 +1,39 @@
+body {
+  font-family: "CommitMono";
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 4em;
+  margin-top: 5em;
+
+  img {
+    max-width: 600px;
+  }
+
+  .definition {
+    h1 {
+      font-size: 50px;
+      margin: 0;
+    }
+
+    div {
+      font-size: 20px;
+      margin-left: 1em;
+    }
+
+    p {
+      margin-left: 1em;
+      font-size: 18px;
+    }
+  }
+}
+
+main {
+  line-height: 1.5;
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 15px;
+}

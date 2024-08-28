@@ -32,9 +32,8 @@ export class BlogPost implements FileUnit {
 
   async compile() {
     const hash = await hashString(this.file.input?.content ?? "");
-    if (hash === this.hash) return this.content;
-
-    if (!this.file.input.content) return "";
+    if (hash === this.hash) return;
+    if (!this.file.input.content) return;
 
     this.content = await renderLiquid(this.file.input.content, {
       page: this.file,
@@ -43,7 +42,7 @@ export class BlogPost implements FileUnit {
     this.content = await renderMD(this.file.input.content);
     this.hash = hash;
 
-    return this.content;
+    return;
   }
 
   async reload(gomi: Gomi) {
