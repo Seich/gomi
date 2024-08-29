@@ -35,10 +35,6 @@ export class BlogPost implements FileUnit {
     if (hash === this.hash) return;
     if (!this.file.input.content) return;
 
-    this.content = await renderLiquid(this.file.input.content, {
-      page: this.file,
-    });
-
     this.content = await renderMD(this.file.input.content);
     this.hash = hash;
 

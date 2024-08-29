@@ -65,11 +65,15 @@ their content.
 
 For example here's how you'd show a list of posts:
 
+{% raw %}
+
 ```liquid
 {% for post in site.posts limit:10 %}
   <a href="{post.url}">{{post.title}}</a>
 {% endfor %}
 ```
+
+{% endraw %}
 
 Posts:
 The \_posts directory is special, the file names are used to determine it's final
