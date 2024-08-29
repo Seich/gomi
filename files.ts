@@ -67,8 +67,8 @@ export const writeFile = async (unit: FileUnit, gomi: Gomi) => {
 
   const output = await renderLiquid(content, {
     site: { posts: gomi.posts, ...env },
-    page: { ...unit.file },
-    post: { ...unit.file.meta, file: unit },
+    page: unit,
+    post: { ...unit.file.meta, ...unit },
     content: unit.content,
   });
   await Deno.writeTextFile(outputFilePath, output);

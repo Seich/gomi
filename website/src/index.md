@@ -1,3 +1,4 @@
+{% raw %}
 Bugs: https://github.com/seich/gomi/issues
 
 To build the site:
@@ -65,15 +66,11 @@ their content.
 
 For example here's how you'd show a list of posts:
 
-{% raw %}
-
 ```liquid
 {% for post in site.posts limit:10 %}
   <a href="{post.url}">{{post.title}}</a>
 {% endfor %}
 ```
-
-{% endraw %}
 
 Posts:
 The \_posts directory is special, the file names are used to determine it's final
@@ -120,3 +117,4 @@ Here's a minimal example:
 ```
 
 More information is available here: https://liquidjs.com/tutorials/register-filters-tags.html
+{% endraw %}
