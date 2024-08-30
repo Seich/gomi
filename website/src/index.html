@@ -1,0 +1,72 @@
+{%- capture archs -%}
+Mac OS (ARM): aarch64-apple-darwin,
+Max OS (x86): x86_64-apple-darwin,
+Linux (ARM): aarch64-unknown-linux-gnu,
+Linux (x86): x86_64-unknown-linux-gnu,
+Windows: x86_64-pc-windows-msvc.exe
+{%- endcapture -%}
+
+<section id="installation">
+  <h2>Installation:</h2>
+  {%- assign lines = archs | split: ',\n' -%}
+  {%- for arch in lines %}
+    <details>
+      <summary>{{arch | split: ':' | first}}</summary>
+      {% code lang:"sh" %} 
+curl -L -o gomi https://github.com/seich/gomi/releases/latest/download/gomi-{{arch| split: ': ' | last}}
+chmod +x ./gomi 
+./gomi --help 
+      {% endcode %}
+    </details>
+  {%- endfor%}
+</section>
+
+<section>
+  <h2>Getting Started</h2>
+  <p>By default gomi will build the site located in the <code>`/src`</code> folder. You can build it by running:</p>
+
+  {% code lang:"sh" %}
+  gomi compile
+  {% endcode %}
+
+  <p>To have it served as well as built you can run:</p>
+
+  {% code lang:"sh" %}
+  gomi serve
+  {% endcode %}
+
+  <p>
+    To automatically watch for changes and rebuild the site as needed you can 
+    add the <code>`--watch`</code> flag, it works for both compile and serve:
+  </p>
+
+  {% code lang:"sh" %}
+  gomi serve --watch
+  {% endcode %}
+
+  <p>To have it reload your browser as you make changes you can add the <code>`--hot`</code> flag:</p>
+
+  {% code lang:"sh" %}
+  gomi serve --watch --hot
+  {% endcode %}
+
+</section>
+
+<section>
+  <h2>Configuration</h2>
+  <p>
+    Gomita comes preloaded with sensible defaults so you don't have to spend 
+    time configuring it. You can configure it using environment variables or a
+    <code>`.env`</code> file.
+  </p>
+
+  <ul>
+    <li>PORT: The port the server should run on, if not set a random port is chosen. </li>
+    <li>INPUT: The directory to build. Defaults to <code>`./src`</code></li>
+    <li>OUTPUT: The directory where the build result will be placed. Defaults to <code>`./output`</code></li>
+    <li>SHIKI_THEME_DARK: The syntax highlighter colorscheme to user for a dark theme. Defaults to <code>`min-dark`</code></li>
+    <li>SHIKI_THEME_LIGHT: The syntax highlighter colorscheme to user for a light theme. Defaults to <code>`min-light`</code></li>
+    <li>SITE_*: Any environment variable starting with SITE_ will be available when building to the templates.</li>
+  </ul>
+
+</section>

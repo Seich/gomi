@@ -151,7 +151,7 @@ Plugins
       try {
         await gomi.compile(_event.paths);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
   }

@@ -84,7 +84,7 @@ export class StaticFile implements FileUnit {
       await this.compile();
       await this.write(gomi);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 

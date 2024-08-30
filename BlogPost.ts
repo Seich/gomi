@@ -56,7 +56,7 @@ export class BlogPost implements FileUnit {
       this.compile();
       this.write(gomi);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 

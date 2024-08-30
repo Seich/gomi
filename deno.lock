@@ -36,6 +36,7 @@
       "npm:remark-parse": "npm:remark-parse@11.0.0",
       "npm:remark-rehype": "npm:remark-rehype@11.1.0",
       "npm:sanitize-html@^2.11": "npm:sanitize-html@2.13.0",
+      "npm:shiki": "npm:shiki@1.12.1",
       "npm:unified": "npm:unified@11.0.5"
     },
     "jsr": {
