@@ -3,7 +3,7 @@ import { resolve } from "@std/path";
 import { EventEmitter } from "node:events";
 
 import { BlogPost } from "./BlogPost.ts";
-import { getEnvVariables, FileUnit } from "./files.ts";
+import { FileUnit, getEnvVariables } from "./files.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./StaticFiles.ts";
@@ -12,6 +12,10 @@ const config = await import("./deno.json", { with: { type: "json" } });
 
 class GomiEvents extends EventEmitter {
   #enabled = false;
+
+  areEnabled() {
+    return this.#enabled;
+  }
 
   enable() {
     this.#enabled = true;
@@ -97,7 +101,8 @@ export class Gomi {
   async compile(files?: string[]) {
     if (files) {
       for (const file of files) {
-        // TODO: Improve this so we don't compile the entire site whenever a layout changes
+        // TODO: Only recompile files affected by the layout changes.
+        // Recompile everything on layout changes.
         if (file.includes("_layout.html")) {
           this.layouts = await LayoutStore.build();
           await this.compile();
@@ -105,7 +110,8 @@ export class Gomi {
           return;
         }
 
-        const unit = [...this.posts, ...this.staticFiles].find(
+        // Check if the file is already loaded
+        let unit = [...this.posts, ...this.staticFiles].find(
           (p) => p.file.input.filepath === file,
         );
 
@@ -116,8 +122,19 @@ export class Gomi {
           return;
         }
 
-        // TODO: handle a new file being added.
+        // Load the file if it hasn't been loaded before
+        if (file.includes(Gomi.postsDir)) {
+          unit = await BlogPost.load(file);
+          this.posts.push(unit as BlogPost);
+        } else {
+          unit = await StaticFile.load(file);
+          this.staticFiles.push(unit);
+        }
+
+        unit.reload(this);
+        this.events.emitFileCompilation(unit);
       }
+
       return;
     }
 

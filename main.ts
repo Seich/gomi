@@ -1,10 +1,11 @@
 import "@std/dotenv/load";
 
 import { parseArgs } from "@std/cli";
-import { serveDir } from "@std/http";
+import { debounce, type DebouncedFunction } from "@std/async/debounce";
 
 import { Gomi } from "./gomi.ts";
 import { serveGomita } from "./server.ts";
+import { liveReload, LIVERELOAD_PORT } from "./liveReloadServer.ts";
 
 async function main() {
   const args = parseArgs(Deno.args, {
@@ -143,13 +144,25 @@ Plugins
 
   if (args.hot) {
     gomi.emitEvents();
+    Deno.serve({
+      port: LIVERELOAD_PORT,
+    }, liveReload(gomi));
   }
 
   if (args.watch) {
+    const debounced: Record<string, DebouncedFunction<[]>> = {};
+
     const watcher = Deno.watchFs(Gomi.inputDir);
-    for await (const _event of watcher) {
+    for await (const event of watcher) {
+      const eventId = event.paths[0];
+      if (!debounced[eventId]) {
+        debounced[eventId] = debounce(async () => {
+          await gomi.compile(event.paths);
+        }, 300);
+      }
+
       try {
-        await gomi.compile(_event.paths);
+        debounced[eventId]();
       } catch (e) {
         console.error(e);
       }
