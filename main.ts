@@ -1,11 +1,14 @@
 import "@std/dotenv/load";
 
 import { parseArgs } from "@std/cli";
-import { debounce, type DebouncedFunction } from "@std/async/debounce";
+import {
+  debounce,
+  type DebouncedFunction,
+} from "@std/async/debounce";
 
 import { Gomi } from "./gomi.ts";
-import { serveGomita } from "./server.ts";
 import { liveReload, LIVERELOAD_PORT } from "./liveReloadServer.ts";
+import { serveGomita } from "./server.ts";
 
 async function main() {
   const args = parseArgs(Deno.args, {

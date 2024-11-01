@@ -9,7 +9,7 @@ import {
   TopLevelToken,
 } from "https://esm.sh/liquidjs@10.18.0";
 import { getPlugins } from "../plugins.ts";
-import { codeToHtml } from "npm:shiki";
+import { codeToHtml } from "shiki";
 
 export const registerCodeTag = (engine: Liquid) => {
   const lightTheme = Deno.env.get("SHIKI_THEME_LIGHT") ?? "min-light";

@@ -1,7 +1,6 @@
 import { walk } from "@std/fs";
 import { format, join, parse } from "@std/path";
 
-import { renderLiquid } from "./exts/liquid.ts";
 import { renderMD } from "./exts/md.ts";
 import {
   FileUnit,
