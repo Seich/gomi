@@ -1,6 +1,9 @@
 import type { Gomi } from "./gomi.ts";
+import embed from "./hmr.json" with { type: "json" };
 
-const LiveReloadScript = Deno.readTextFileSync("./hmr.js");
+const LiveReloadScript = new TextDecoder().decode(
+  new Uint8Array(embed["hmr.js"].contents),
+);
 
 export const LIVERELOAD_PORT = 35729;
 
@@ -16,7 +19,7 @@ type LRMessage = {
 
 export const liveReload = (gomi: Gomi) => {
   let currentUrl: string | null = null;
-  return async (req: Request) => {
+  return (req: Request) => {
     if (req.headers.get("upgrade") === "websocket") {
       const { socket, response } = Deno.upgradeWebSocket(req);
 
