@@ -31,14 +31,18 @@ export class BlogPost implements FileUnit {
   }
 
   async compile() {
-    const hash = await hashString(this.file.input?.content ?? "");
-    if (hash === this.hash) return;
-    if (!this.file.input.content) return;
+    try {
+      const hash = await hashString(this.file.input?.content ?? "");
+      if (hash === this.hash) return;
+      if (!this.file.input.content) return;
 
-    this.content = await renderMD(this.file.input.content);
-    this.hash = hash;
+      this.content = await renderMD(this.file.input.content);
+      this.hash = hash;
 
-    return;
+      return;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async reload(gomi: Gomi) {
@@ -127,7 +131,7 @@ export class BlogPost implements FileUnit {
         Temporal.PlainDate.compare(
           b.file.meta.date as string,
           a.file.meta.date as string,
-        ),
+        )
       );
     } catch (_) {
       return [];

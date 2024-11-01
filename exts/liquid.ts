@@ -1,4 +1,13 @@
-import { Hash, Liquid, Tokenizer } from "https://esm.sh/liquidjs@10.16.1";
+// @ts-nocheck: Liquidjs is imcompatible with deno's typescript impl
+import {
+  Context,
+  Emitter,
+  Hash,
+  Liquid,
+  TagToken,
+  Tokenizer,
+  TopLevelToken,
+} from "https://esm.sh/liquidjs@10.18.0";
 import { getPlugins } from "../plugins.ts";
 import { codeToHtml } from "npm:shiki";
 
@@ -7,7 +16,7 @@ export const registerCodeTag = (engine: Liquid) => {
   const darkTheme = Deno.env.get("SHIKI_THEME_DARK") ?? "min-dark";
 
   engine.registerTag("code", {
-    parse(tagToken, remainTokens) {
+    parse(tagToken: TagToken, remainTokens: TopLevelToken[]) {
       this.args = new Hash(tagToken.args);
       this.tpls = [];
       this.liquid.parser
@@ -21,10 +30,14 @@ export const registerCodeTag = (engine: Liquid) => {
         })
         .start();
     },
-    *render(context, emitter) {
+    *render(context: Context, emitter: Emitter) {
       const { lang } = yield this.args.render(context);
       emitter.write("<code>");
-      const a = yield this.liquid.render(this.tpls, context.getAll(), context.opts)
+      const a = yield this.liquid.render(
+        this.tpls,
+        context.getAll(),
+        context.opts,
+      );
       const code: string = yield codeToHtml(a.trim(), {
         lang: lang ?? "text",
         themes: {

@@ -4,10 +4,10 @@ import { format, join, parse } from "@std/path";
 import { renderScss } from "./exts/scss.ts";
 import { renderMD } from "./exts/md.ts";
 import {
+  FileUnit,
   ParsedFile,
   readFileWithFrontMatter,
   writeFile,
-  FileUnit,
 } from "./files.ts";
 import { Gomi } from "./gomi.ts";
 import { hashString } from "./hash.ts";
@@ -24,49 +24,53 @@ export class StaticFile implements FileUnit {
   }
 
   async compile() {
-    const outputFilePath = join(Gomi.outputDir, this.file.url);
-    const { dir } = parse(outputFilePath);
+    try {
+      const outputFilePath = join(Gomi.outputDir, this.file.url);
+      const { dir } = parse(outputFilePath);
 
-    // TODO: Hash file and don't copy again
-    if (this.shouldCopy) {
-      await ensureDir(dir);
-      await copy(this.file.input.filepath, outputFilePath, {
-        overwrite: true,
-      });
-      return;
-    }
-
-    const hash = await hashString(this.file.input?.content ?? "");
-    if (hash === this.hash) return;
-    if (!this.file.input.content) {
-      this.content = "";
-      return;
-    }
-
-    switch (this.file.input.ext) {
-      case ".scss":
-        this.file.url = format({
-          ...parse(this.file.url),
-          ext: ".css",
-          base: "",
+      // TODO: Hash file and don't copy again
+      if (this.shouldCopy) {
+        await ensureDir(dir);
+        await copy(this.file.input.filepath, outputFilePath, {
+          overwrite: true,
         });
-        this.content = renderScss(this.file.input.content);
-        break;
-      case ".html":
-      case ".xml":
-        this.content = this.file.input.content;
-        break;
-      case ".md":
-        this.file.url = format({
-          ...parse(this.file.url),
-          ext: ".html",
-          base: "",
-        });
-        this.content = await renderMD(this.file.input.content);
-        break;
-    }
+        return;
+      }
 
-    this.hash = hash;
+      const hash = await hashString(this.file.input?.content ?? "");
+      if (hash === this.hash) return;
+      if (!this.file.input.content) {
+        this.content = "";
+        return;
+      }
+
+      switch (this.file.input.ext) {
+        case ".scss":
+          this.file.url = format({
+            ...parse(this.file.url),
+            ext: ".css",
+            base: "",
+          });
+          this.content = renderScss(this.file.input.content);
+          break;
+        case ".html":
+        case ".xml":
+          this.content = this.file.input.content;
+          break;
+        case ".md":
+          this.file.url = format({
+            ...parse(this.file.url),
+            ext: ".html",
+            base: "",
+          });
+          this.content = await renderMD(this.file.input.content);
+          break;
+      }
+
+      this.hash = hash;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async reload(gomi: Gomi) {
