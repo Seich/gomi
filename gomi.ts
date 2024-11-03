@@ -1,44 +1,14 @@
 import { ensureDir, existsSync } from "@std/fs";
 import { resolve } from "@std/path";
-import { EventEmitter } from "node:events";
 
 import { BlogPost } from "./BlogPost.ts";
-import { FileUnit, getEnvVariables } from "./files.ts";
+import { getEnvVariables } from "./files.ts";
 import { LayoutStore } from "./layouts.ts";
 import { getPlugins, Plugin } from "./plugins.ts";
 import { StaticFile } from "./StaticFiles.ts";
+import { GomiEvents } from "./GomiEvents.ts";
 
 const config = await import("./deno.json", { with: { type: "json" } });
-
-class GomiEvents extends EventEmitter {
-  #enabled = false;
-
-  areEnabled() {
-    return this.#enabled;
-  }
-
-  enable() {
-    this.#enabled = true;
-  }
-
-  onFileCompiled(cb: (unit: FileUnit) => void) {
-    this.on("fileCompiled", cb);
-  }
-
-  onLayoutUpdated(cb: (layout: string) => void) {
-    this.on("layoutUpdated", cb);
-  }
-
-  emitFileCompilation(unit: FileUnit) {
-    if (!this.#enabled) return;
-    this.emit("fileCompiled", unit);
-  }
-
-  emitLayoutUpdate(layout: string) {
-    if (!this.#enabled) return;
-    this.emit("layoutUpdated", layout);
-  }
-}
 
 export class Gomi {
   static outputDir = resolve(Deno.env.get("OUTPUT") ?? "output");
