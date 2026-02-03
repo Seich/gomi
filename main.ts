@@ -1,10 +1,7 @@
 import "@std/dotenv/load";
 
 import { parseArgs } from "@std/cli";
-import {
-  debounce,
-  type DebouncedFunction,
-} from "@std/async/debounce";
+import { debounce, type DebouncedFunction } from "@std/async/debounce";
 
 import { Gomi } from "./gomi.ts";
 import { liveReload, LIVERELOAD_PORT } from "./liveReloadServer.ts";
@@ -147,9 +144,15 @@ Plugins
 
   if (args.hot) {
     gomi.emitEvents();
-    Deno.serve({
-      port: LIVERELOAD_PORT,
-    }, liveReload(gomi));
+    Deno.serve(
+      {
+        port: LIVERELOAD_PORT,
+        onListen() {
+          console.log(`Live reloading enabled.`);
+        },
+      },
+      liveReload(gomi),
+    );
   }
 
   if (args.watch) {

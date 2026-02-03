@@ -7,15 +7,17 @@ const LiveReloadScript = new TextDecoder().decode(
 
 export const LIVERELOAD_PORT = 35729;
 
-type LRMessage = {
-  command: "hello";
-  protocols: Array<string>;
-  ver: string;
-} | {
-  command: "info";
-  plugins: Record<string, { disable: boolean; version: string }>;
-  url: string;
-};
+type LRMessage =
+  | {
+      command: "hello";
+      protocols: Array<string>;
+      ver: string;
+    }
+  | {
+      command: "info";
+      plugins: Record<string, { disable: boolean; version: string }>;
+      url: string;
+    };
 
 export const liveReload = (gomi: Gomi) => {
   let currentUrl: string | null = null;
@@ -27,34 +29,38 @@ export const liveReload = (gomi: Gomi) => {
       socket.onerror = (error) => console.error("WSERROR:", error);
       socket.onopen = () => {
         gomi.events.onFileCompiled((unit) => {
-          socket.send(JSON.stringify({
-            command: "reload",
-            path: unit.file.url,
-            liveCSS: true,
-            liveImg: true,
-          }));
+          socket.send(
+            JSON.stringify({
+              command: "reload",
+              path: unit.file.url,
+              liveCSS: true,
+              liveImg: true,
+            }),
+          );
         });
 
         gomi.events.onLayoutUpdated(() =>
-          socket.send(JSON.stringify({
-            command: "reload",
-            path: currentUrl,
-            liveCSS: true,
-            liveImg: true,
-          }))
+          socket.send(
+            JSON.stringify({
+              command: "reload",
+              path: currentUrl,
+              liveCSS: true,
+              liveImg: true,
+            }),
+          ),
         );
       };
 
       socket.onmessage = (ev) => {
         const message: LRMessage = JSON.parse(ev.data);
         if (message.command === "hello") {
-          socket.send(JSON.stringify({
-            command: "hello",
-            protocols: [
-              "http://livereload.com/protocols/official-7",
-            ],
-            serverName: "Gomi(ta)",
-          }));
+          socket.send(
+            JSON.stringify({
+              command: "hello",
+              protocols: ["http://livereload.com/protocols/official-7"],
+              serverName: "Gomi(ta)",
+            }),
+          );
         } else if (message.command === "info") {
           currentUrl = message.url;
         }
