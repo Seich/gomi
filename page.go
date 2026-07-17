@@ -32,7 +32,8 @@ func loadPages(config gomiConfig) ([]file, []file) {
 			return nil
 		}
 
-		dest := strings.Replace(path, config.input, config.output, 1)
+		dest := strings.Replace(path, filepath.Clean(config.input), "", 1)
+		dest = filepath.Join(filepath.Clean(config.output), dest)
 		page := file{src: path, dest: dest}
 
 		if shouldBeCopied(path) {

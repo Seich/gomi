@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io/fs"
 	"net/url"
 	"os"
@@ -48,10 +49,19 @@ func loadPost(config gomiConfig, path string, layoutTemplate []byte) file {
 }
 
 func loadPosts(config gomiConfig) []file {
+	layoutTemplate := []byte("{{ content }}")
+
 	layoutTemplate, err := os.ReadFile(filepath.Join(config.postsDir, "_layout.html"))
-	check(err)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		check(err)
+	}
 
 	var postFiles []file
+
+	if _, err := os.Stat(config.postsDir); errors.Is(err, os.ErrNotExist) {
+		return postFiles
+	}
+
 	filepath.WalkDir(config.postsDir, func(path string, d fs.DirEntry, err error) error {
 		check(err)
 

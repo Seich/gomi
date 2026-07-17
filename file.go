@@ -64,7 +64,7 @@ func writeFiles(config gomiConfig, files []file) {
 		n, err := f.Write(page)
 		check(err)
 
-		log.Info("Writing", "File", file.dest, "Bytes", n)
+		log.Info("Writing", "File", file.src, "To", file.dest, "Bytes", n)
 	}
 }
 
@@ -78,7 +78,7 @@ func copyFiles(files []file) {
 		err = os.WriteFile(file.dest, data, os.ModePerm)
 		check(err)
 
-		log.Info("Copying", "File", file.src)
+		log.Info("Copying", "File", file.src, "To", file.dest)
 	}
 }
 

@@ -94,6 +94,13 @@ func loadPhotos(config gomiConfig) []file {
 	db := openPhotoDB(config)
 
 	var photos []file
+
+	if _, err := os.Stat(config.photosDir); errors.Is(err, os.ErrNotExist) {
+		return photos
+	} else if err != nil {
+		check(err)
+	}
+
 	filepath.WalkDir(config.photosDir, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil

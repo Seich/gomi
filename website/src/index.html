@@ -12,43 +12,33 @@ Windows: x86_64-pc-windows-msvc.exe
   {%- for arch in lines %}
     <details>
       <summary>{{arch | split: ':' | first}}</summary>
-      {% code lang:"sh" %} 
 curl -L -o gomi https://github.com/seich/gomi/releases/latest/download/gomi-{{arch| split: ': ' | last}}
 chmod +x ./gomi 
 ./gomi --help 
-      {% endcode %}
     </details>
-  {%- endfor%}
+  {%endfor%}
 </section>
 
 <section>
   <h2>Getting Started</h2>
   <p>By default gomi will build the site located in the <code>`/src`</code> folder. You can build it by running:</p>
 
-  {% code lang:"sh" %}
   gomi compile
-  {% endcode %}
 
   <p>To have it served as well as built you can run:</p>
 
-  {% code lang:"sh" %}
   gomi serve
-  {% endcode %}
 
   <p>
     To automatically watch for changes and rebuild the site as needed you can 
     add the <code>`--watch`</code> flag, it works for both compile and serve:
   </p>
 
-  {% code lang:"sh" %}
   gomi serve --watch
-  {% endcode %}
 
   <p>To have it reload your browser as you make changes you can add the <code>`--hot`</code> flag:</p>
 
-  {% code lang:"sh" %}
   gomi serve --watch --hot
-  {% endcode %}
 
 </section>
 
