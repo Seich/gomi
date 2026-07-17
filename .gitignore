@@ -11,3 +11,4 @@ devenv.local.nix
 
 .env
 website/output
+node_modules/
