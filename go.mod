@@ -11,6 +11,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/HugoSmits86/nativewebp v1.3.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.20.0 // indirect
+	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
@@ -34,6 +35,7 @@ require (
 )
 
 require (
+	github.com/alexflint/go-arg v1.6.1
 	github.com/anthonynsimon/bild v0.16.1
 	github.com/charmbracelet/log v1.0.0
 	github.com/gorilla/feeds v1.2.0

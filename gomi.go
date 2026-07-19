@@ -1,64 +1,44 @@
 package main
 
 import (
-	"errors"
-	"io/fs"
 	"os"
-	"path/filepath"
 
+	"github.com/alexflint/go-arg"
 	"github.com/charmbracelet/log"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/osteele/liquid"
-	"github.com/yuin/goldmark"
 )
 
-type gomiConfig struct {
-	input           string
-	output          string
-	highlightTheme  string
-	siteUrl         string
-	siteDescription string
-	siteName        string
-	postsDir        string
-	photosDir       string
+type args struct {
+	WorkDir         string `arg:"positional"`
+	Input           string `arg:"-i,env:GOMI_INPUT"`
+	Output          string `arg:"-o,env:GOMI_OUTPUT"`
+	HighlightTheme  string `arg:"env:GOMI_HIGHLIGHT_THEME"`
+	SiteUrl         string `arg:"env:SITE_URL"`
+	SiteDescription string `arg:"env:SITE_DESCRIPTION"`
+	SiteName        string `arg:"env:SITE_NAME"`
+}
 
-	posts       []file
-	photos      []file
-	filesToCopy []file
-	pages       []file
+func (args) Version() string {
+	return "0.0.1"
+}
 
-	liquidEngine   *liquid.Engine
-	markdownParser goldmark.Markdown
+func (args) Description() string {
+	return "Hello World"
 }
 
 func main() {
-	input := os.Getenv("GOMI_INPUT")
-	output := os.Getenv("GOMI_OUTPUT")
-	highlightTheme := os.Getenv("GOMI_HIGHLIGHT_THEME")
-	siteUrl := os.Getenv("SITE_URL")
-	siteDescription := os.Getenv("SITE_DESCRIPTION")
-	siteName := os.Getenv("SITE_NAME")
+	var args args
+	arg.MustParse(&args)
 
-	postsDir := filepath.Join(input, "_posts")
-	photosDir := filepath.Join(input, "_photos")
-
-	config := gomiConfig{
-		input:           input,
-		output:          output,
-		highlightTheme:  highlightTheme,
-		siteUrl:         siteUrl,
-		siteDescription: siteDescription,
-		siteName:        siteName,
-		postsDir:        postsDir,
-		photosDir:       photosDir,
+	if len(args.WorkDir) > 0 {
+		log.Info("WD Changed", "WD", args.WorkDir)
+		os.Chdir(args.WorkDir)
 	}
 
-	if _, err := os.Stat(input); errors.Is(err, fs.ErrNotExist) {
-		log.Fatal("Input directory does not exist.")
-	}
+	config := NewGomiConfig(args)
 
 	config.liquidEngine = newLiquidEngine()
-	config.markdownParser = newMarkdownParser(highlightTheme)
+	config.markdownParser = newMarkdownParser(config.highlightTheme)
 
 	config.posts = loadPosts(config)
 	config.photos = loadPhotos(config)

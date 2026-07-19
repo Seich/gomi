@@ -28,6 +28,7 @@ func loadPost(config gomiConfig, path string, layoutTemplate []byte) file {
 		Url:      postUrl,
 		Date:     postDate,
 		dest:     dest,
+		src:      path,
 		Content:  buf,
 		Title:    meta.Title,
 		Tags:     meta.Tags,
