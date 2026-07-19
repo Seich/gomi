@@ -56,10 +56,11 @@ func (db *photoDb) getPhoto(path string) file {
 		src:  path,
 		dest: dest,
 
+		Url:   url,
 		Title: filename,
 		Date:  time.Now(),
 
-		Url: url,
+		Type: FiletypePhoto,
 	}
 
 	if !data.Exists() {
@@ -90,15 +91,11 @@ func (db *photoDb) save() {
 	check(err)
 }
 
-func loadPhotos(config gomiConfig) []file {
-	db := openPhotoDB(config)
+func loadPhotos(config *gomiConfig) {
+	db := openPhotoDB(*config)
 
-	var photos []file
-
-	if _, err := os.Stat(config.photosDir); errors.Is(err, os.ErrNotExist) {
-		return photos
-	} else if err != nil {
-		check(err)
+	if !directoryExists(config.photosDir) {
+		return
 	}
 
 	filepath.WalkDir(config.photosDir, func(path string, d fs.DirEntry, err error) error {
@@ -131,14 +128,12 @@ func loadPhotos(config gomiConfig) []file {
 			log.Info("Thumbnail created", "File", d.Name(), "Thumbnail", thumbnailPath)
 		}
 
-		photos = append(photos, photoFile)
+		config.files = append(config.files, photoFile)
 
 		return nil
 	})
 
 	db.save()
-
-	return photos
 }
 
 func isSupportedImage(path string) bool {

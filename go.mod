@@ -30,7 +30,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/image v0.41.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -40,6 +40,7 @@ require (
 	github.com/charmbracelet/log v1.0.0
 	github.com/gorilla/feeds v1.2.0
 	github.com/osteele/tuesday v1.0.4 // indirect
+	github.com/sgtdi/fswatcher v1.3.0
 	github.com/tidwall/gjson v1.19.0
 	github.com/tidwall/sjson v1.2.5
 	github.com/yuin/goldmark v1.8.4

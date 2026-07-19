@@ -8,9 +8,8 @@ import (
 	"strings"
 )
 
-func loadPages(config gomiConfig) ([]file, []file) {
-	var filesToCopy []file
-	var filesToPreprocess []file
+func loadPages(config *gomiConfig) {
+	var pages []file
 	filepath.WalkDir(config.input, func(path string, d fs.DirEntry, err error) error {
 		check(err)
 
@@ -24,20 +23,16 @@ func loadPages(config gomiConfig) ([]file, []file) {
 		}
 
 		// hidden files and folders
-		if strings.HasPrefix(d.Name(), ".") {
-			return nil
-		}
-
-		if strings.HasPrefix(d.Name(), "_") {
+		if strings.HasPrefix(d.Name(), ".") || strings.HasPrefix(d.Name(), "_") {
 			return nil
 		}
 
 		dest := strings.Replace(path, filepath.Clean(config.input), "", 1)
 		dest = filepath.Join(filepath.Clean(config.output), dest)
-		page := file{src: path, dest: dest}
+		page := file{src: path, dest: dest, Type: FiletypeCopy}
 
 		if shouldBeCopied(path) {
-			filesToCopy = append(filesToCopy, file{src: path, dest: dest})
+			config.files = append(config.files, page)
 			return nil
 		}
 
@@ -52,7 +47,7 @@ func loadPages(config gomiConfig) ([]file, []file) {
 			page.Tags = meta.Tags
 			page.dest = strings.Replace(page.dest, ".md", ".html", 1)
 
-			layout := findLayoutFor(config, path)
+			layout := findLayoutFor(*config, path)
 			if layout != nil {
 				buf = []byte(strings.Replace(string(layout), "{{ content }}", string(buf), 1))
 			}
@@ -64,15 +59,15 @@ func loadPages(config gomiConfig) ([]file, []file) {
 
 		page.Url = page.dest[len(config.output):]
 		page.Content = []byte(strings.Replace(string(page.Content), "{{ content }}", string(page.Content), 1))
+		page.Type = FiletypePage
 
-		filesToPreprocess = append(filesToPreprocess, page)
+		pages = append(pages, page)
 
 		return nil
 	})
 
-	filesToPreprocess = buildRelationShips(filesToPreprocess, config)
-
-	return filesToCopy, filesToPreprocess
+	pages = buildRelationShips(pages, *config)
+	config.files = append(config.files, pages...)
 }
 
 func isMarkdownFile(path string) bool {
