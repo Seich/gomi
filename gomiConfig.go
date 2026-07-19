@@ -25,16 +25,16 @@ type gomiConfig struct {
 	postsDir        string
 	photosDir       string
 
-	files []file
+	files []*file
 
 	liquidEngine   *liquid.Engine
 	markdownParser goldmark.Markdown
 }
 
 func (config *gomiConfig) Load() {
+	loadPages(config)
 	loadPosts(config)
 	loadPhotos(config)
-	loadPages(config)
 }
 
 func (config *gomiConfig) GenerateBlogFeed() {
@@ -87,7 +87,7 @@ func (config *gomiConfig) Photos() []file {
 	var posts []file
 	for _, file := range config.files {
 		if file.Type == FiletypePhoto {
-			posts = append(posts, file)
+			posts = append(posts, *file)
 		}
 	}
 
@@ -102,7 +102,7 @@ func (config *gomiConfig) Posts() []file {
 	var posts []file
 	for _, file := range config.files {
 		if file.Type == FiletypePost {
-			posts = append(posts, file)
+			posts = append(posts, *file)
 		}
 	}
 

@@ -43,7 +43,7 @@ func openPhotoDB(config gomiConfig) *photoDb {
 	return photos
 }
 
-func (db *photoDb) getPhoto(path string) file {
+func (db *photoDb) getPhoto(path string) *file {
 	_, filename := filepath.Split(path)
 	photoKey := strings.Replace(filename, ".", "\\.", 10)
 	data := gjson.Get(db.dbFileContent, photoKey)
@@ -83,7 +83,7 @@ func (db *photoDb) getPhoto(path string) file {
 		photo.Title = title
 	}
 
-	return photo
+	return &photo
 }
 
 func (db *photoDb) save() {

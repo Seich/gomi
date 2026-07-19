@@ -43,9 +43,9 @@ type file struct {
 	Date         time.Time
 	FilesDir     string
 
-	Ancestors []file
-	Siblings  []file
-	Children  []file
+	Ancestors []*file
+	Siblings  []*file
+	Children  []*file
 
 	Type FileType
 }

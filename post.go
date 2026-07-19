@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func loadPost(config gomiConfig, path string) file {
+func loadPost(config gomiConfig, path string) *file {
 	layoutTemplate := []byte("{{ content }}")
 
 	layoutTemplate, err := os.ReadFile(filepath.Join(config.postsDir, "_layout.html"))
@@ -50,7 +50,7 @@ func loadPost(config gomiConfig, path string) file {
 
 	post.Content = page
 
-	return post
+	return &post
 }
 
 func loadPosts(config *gomiConfig) {
@@ -67,7 +67,6 @@ func loadPosts(config *gomiConfig) {
 
 		post := loadPost(*config, path)
 		config.files = append(config.files, post)
-		return nil
 
 		return nil
 	})

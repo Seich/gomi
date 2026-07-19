@@ -9,7 +9,7 @@ import (
 )
 
 func loadPages(config *gomiConfig) {
-	var pages []file
+	var pages []*file
 	filepath.WalkDir(config.input, func(path string, d fs.DirEntry, err error) error {
 		check(err)
 
@@ -32,7 +32,7 @@ func loadPages(config *gomiConfig) {
 		page := file{src: path, dest: dest, Type: FiletypeCopy}
 
 		if shouldBeCopied(path) {
-			config.files = append(config.files, page)
+			config.files = append(config.files, &page)
 			return nil
 		}
 
@@ -61,13 +61,12 @@ func loadPages(config *gomiConfig) {
 		page.Content = []byte(strings.Replace(string(page.Content), "{{ content }}", string(page.Content), 1))
 		page.Type = FiletypePage
 
-		pages = append(pages, page)
+		pages = append(pages, &page)
 
 		return nil
 	})
 
-	pages = buildRelationShips(pages, *config)
-	config.files = append(config.files, pages...)
+	buildRelationShips(*config)
 }
 
 func isMarkdownFile(path string) bool {
@@ -82,10 +81,10 @@ func shouldBeCopied(path string) bool {
 	return !shouldBePreprocessed
 }
 
-func buildRelationShips(filesToPreprocess []file, config gomiConfig) []file {
-	var filesWithRelationships []file
-	for _, file := range filesToPreprocess {
-		ancestor, siblings, children := getPageRelationships(filesToPreprocess, file.dest, config)
+func buildRelationShips(config gomiConfig) []*file {
+	var filesWithRelationships []*file
+	for _, file := range config.files {
+		ancestor, siblings, children := getPageRelationships(file.dest, config)
 
 		file.Ancestors = ancestor
 		file.Siblings = siblings
@@ -97,16 +96,16 @@ func buildRelationShips(filesToPreprocess []file, config gomiConfig) []file {
 	return filesWithRelationships
 }
 
-func getPageRelationships(files []file, path string, config gomiConfig) ([]file, []file, []file) {
+func getPageRelationships(path string, config gomiConfig) ([]*file, []*file, []*file) {
 	ancestorPath := filepath.Join(path, "..", "..", "..")
 	siblingsPath := filepath.Join(path, "..", "..")
 	childrenPath := filepath.Join(path, "..")
 
-	var ancestor []file
-	var siblings []file
-	var children []file
+	var ancestor []*file
+	var siblings []*file
+	var children []*file
 
-	for _, p := range files {
+	for _, p := range config.files {
 		if filepath.Dir(p.dest) == config.output {
 			continue
 		}
