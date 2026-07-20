@@ -11,46 +11,44 @@ import (
 	"time"
 )
 
-func loadPost(config gomiConfig, path string) *file {
+func loadPost(f *file) {
 	layoutTemplate := []byte("{{ content }}")
 
-	layoutTemplate, err := os.ReadFile(filepath.Join(config.postsDir, "_layout.html"))
+	layoutTemplate, err := os.ReadFile(filepath.Join(f.config.postsDir, "_layout.html"))
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		check(err)
 	}
 
+	path := f.src
+
 	postDate, postUrl, postFilesDir := parsePostFilename(path)
-	dest := filepath.Join(config.output, postUrl)
+	dest := filepath.Join(f.config.output, postUrl)
 	fileContent, err := os.ReadFile(path)
 	check(err)
 
-	buf, meta := parsePostMarkdown(config.markdownParser, fileContent)
+	buf, meta := parsePostMarkdown(f.config.markdownParser, fileContent)
 
-	post := file{
-		FilesDir: postFilesDir,
-		Url:      postUrl,
-		Date:     postDate,
-		dest:     dest,
-		src:      path,
-		Content:  buf,
-		Title:    meta.Title,
-		Tags:     meta.Tags,
-		Type:     FiletypePost,
-	}
+	f.FilesDir = postFilesDir
+	f.Url = postUrl
+	f.Date = postDate
+	f.dest = dest
+	f.src = path
+	f.Content = buf
+	f.Title = meta.Title
+	f.Tags = meta.Tags
+	f.Type = FiletypePost
 
 	// Parse liquid within markdown post
-	content, err := config.liquidEngine.ParseAndRender(buf, map[string]any{"post": post})
+	content, err := f.config.liquidEngine.ParseAndRender(buf, map[string]any{"post": *f})
 	check(err)
 
-	post.Content = content
+	f.Content = content
 
 	// Parse the page's layout and liquid templates
-	page, err := config.liquidEngine.ParseAndRender(layoutTemplate, map[string]any{"post": post})
+	page, err := f.config.liquidEngine.ParseAndRender(layoutTemplate, map[string]any{"post": *f})
 	check(err)
 
-	post.Content = page
-
-	return &post
+	f.Content = page
 }
 
 func loadPosts(config *gomiConfig) {
@@ -65,8 +63,7 @@ func loadPosts(config *gomiConfig) {
 			return nil
 		}
 
-		post := loadPost(*config, path)
-		config.files = append(config.files, post)
+		config.files = append(config.files, &file{src: path, Type: FiletypePost, config: config})
 
 		return nil
 	})

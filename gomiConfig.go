@@ -25,7 +25,8 @@ type gomiConfig struct {
 	postsDir        string
 	photosDir       string
 
-	files []*file
+	files   []*file
+	fileMap map[string]*file
 
 	liquidEngine   *liquid.Engine
 	markdownParser goldmark.Markdown
@@ -35,6 +36,11 @@ func (config *gomiConfig) Load() {
 	loadPages(config)
 	loadPosts(config)
 	loadPhotos(config)
+	config.fileMap = make(map[string]*file)
+	for _, file := range config.files {
+		file.load()
+		config.fileMap[file.src] = file
+	}
 }
 
 func (config *gomiConfig) GenerateBlogFeed() {
@@ -73,14 +79,12 @@ func (config *gomiConfig) GenerateBlogFeed() {
 
 func (config *gomiConfig) WriteAll() {
 	for _, file := range config.files {
-		switch file.Type {
-		case FiletypeCopy, FiletypePhoto:
-			file.copyToDest()
-		case FiletypePost, FiletypePage:
-			file.writeFile(config)
+		if file.dest == "" {
+			log.Warn("Emitting file not possible", "file", file.src)
+			continue
 		}
+		file.write()
 	}
-
 }
 
 func (config *gomiConfig) Photos() []file {
@@ -113,7 +117,7 @@ func (config *gomiConfig) Posts() []file {
 	return posts
 }
 
-func NewGomiConfig(args args) gomiConfig {
+func NewGomiConfig(args args) *gomiConfig {
 	postsDir := filepath.Join(args.Input, "_posts")
 	photosDir := filepath.Join(args.Input, "_photos")
 
@@ -121,7 +125,7 @@ func NewGomiConfig(args args) gomiConfig {
 		log.Fatal("Input directory does not exist.")
 	}
 
-	return gomiConfig{
+	gomi := &gomiConfig{
 		input:           args.Input,
 		output:          args.Output,
 		highlightTheme:  args.HighlightTheme,
@@ -133,4 +137,10 @@ func NewGomiConfig(args args) gomiConfig {
 		liquidEngine:    newLiquidEngine(),
 		markdownParser:  newMarkdownParser(args.HighlightTheme),
 	}
+
+	gomi.Load()
+	gomi.WriteAll()
+	gomi.GenerateBlogFeed()
+
+	return gomi
 }

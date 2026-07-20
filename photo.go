@@ -43,25 +43,19 @@ func openPhotoDB(config gomiConfig) *photoDb {
 	return photos
 }
 
-func (db *photoDb) getPhoto(path string) *file {
-	_, filename := filepath.Split(path)
+func (db *photoDb) getPhoto(photo *file) *file {
+	_, filename := filepath.Split(photo.src)
 	photoKey := strings.Replace(filename, ".", "\\.", 10)
 	data := gjson.Get(db.dbFileContent, photoKey)
-	dest := strings.Replace(path, db.config.input, db.config.output, 1)
+	dest := strings.Replace(photo.src, db.config.input, db.config.output, 1)
 	dest = strings.Replace(dest, "_photos", "photos", 1)
 	url, err := url.JoinPath("/photos", filename)
 	check(err)
 
-	photo := file{
-		src:  path,
-		dest: dest,
-
-		Url:   url,
-		Title: filename,
-		Date:  time.Now(),
-
-		Type: FiletypePhoto,
-	}
+	photo.dest = dest
+	photo.Url = url
+	photo.Title = filename
+	photo.Date = time.Now()
 
 	if !data.Exists() {
 		content, err := sjson.Set(db.dbFileContent, photoKey, map[string]string{
@@ -83,7 +77,7 @@ func (db *photoDb) getPhoto(path string) *file {
 		photo.Title = title
 	}
 
-	return &photo
+	return photo
 }
 
 func (db *photoDb) save() {
@@ -91,49 +85,51 @@ func (db *photoDb) save() {
 	check(err)
 }
 
-func loadPhotos(config *gomiConfig) {
-	db := openPhotoDB(*config)
+func loadPhoto(f *file) {
+	db := openPhotoDB(*f.config)
+	photoFile := db.getPhoto(f)
+	dir, filename := filepath.Split(photoFile.dest)
+	thumbnailPath := filepath.Join(dir, "/thumbs/", filename)
+	photoFile.ThumbnailUrl = thumbnailPath[len(f.config.output):]
 
+	if _, err := os.Stat(thumbnailPath); errors.Is(err, os.ErrNotExist) {
+		img, err := imgio.Open(f.src)
+		check(err)
+
+		height := 300
+		width := img.Bounds().Dx() / (img.Bounds().Dy() / height)
+
+		thumbnail := transform.Resize(img, width, height, transform.Linear)
+
+		ensureDirectoryExists(thumbnailPath)
+		err = imgio.Save(thumbnailPath, thumbnail, imgio.JPEGEncoder(100))
+		check(err)
+
+		log.Info("Thumbnail created", "File", filename, "Thumbnail", thumbnailPath)
+	}
+
+	db.save()
+}
+
+func loadPhotos(config *gomiConfig) {
 	if !directoryExists(config.photosDir) {
 		return
 	}
 
 	filepath.WalkDir(config.photosDir, func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() {
+		if d.IsDir() || !isPhoto(path, config) {
 			return nil
 		}
 
-		if !isSupportedImage(d.Name()) {
-			return nil
-		}
-
-		photoFile := db.getPhoto(path)
-		thumbnailPath := filepath.Join(filepath.Dir(photoFile.dest), "/thumbs/", d.Name())
-		photoFile.ThumbnailUrl = thumbnailPath[len(config.output):]
-
-		if _, err := os.Stat(thumbnailPath); errors.Is(err, os.ErrNotExist) {
-
-			img, err := imgio.Open(path)
-			check(err)
-
-			height := 300
-			width := img.Bounds().Dx() / (img.Bounds().Dy() / height)
-
-			thumbnail := transform.Resize(img, width, height, transform.Linear)
-
-			ensureDirectoryExists(thumbnailPath)
-			err = imgio.Save(thumbnailPath, thumbnail, imgio.JPEGEncoder(100))
-			check(err)
-
-			log.Info("Thumbnail created", "File", d.Name(), "Thumbnail", thumbnailPath)
-		}
-
-		config.files = append(config.files, photoFile)
+		config.files = append(config.files, &file{src: path, Type: FiletypePhoto, config: config})
 
 		return nil
 	})
 
-	db.save()
+}
+
+func isPhoto(path string, config *gomiConfig) bool {
+	return isPathInside(path, config.photosDir) && isSupportedImage(path)
 }
 
 func isSupportedImage(path string) bool {

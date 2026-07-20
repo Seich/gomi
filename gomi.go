@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -44,28 +43,27 @@ func main() {
 	}
 
 	gomi := NewGomiConfig(args)
-	gomi.Load()
-	gomi.WriteAll()
-	gomi.GenerateBlogFeed()
-
-	w, _ := fswatcher.New(fswatcher.WithCooldown(200*time.Millisecond), fswatcher.WithPath(gomi.input))
-	ctx := context.Background()
-	go w.Watch(ctx)
 
 	if args.Watch != nil {
-		for event := range w.Events() {
-			var types, flags []string
-			// Loop through types and flags
-			for _, t := range event.Types {
-				types = append(types, t.String())
-			}
-			for _, f := range event.Flags {
-				flags = append(flags, f)
-			}
-			fmt.Printf("File changed: %s %v %v\n", event.Path, types, flags)
-		}
-	} else {
-		// buildEverything(config)
-	}
+		w, _ := fswatcher.New(
+			fswatcher.WithCooldown(200*time.Millisecond),
+			fswatcher.WithPath(gomi.input),
+			fswatcher.WithExcRegex(`db\.json$`),
+		)
 
+		ctx := context.Background()
+		go w.Watch(ctx)
+
+		cwd, err := os.Getwd()
+		check(err)
+
+		for event := range w.Events() {
+			path := event.Path[len(cwd)+1:]
+			file := gomi.fileMap[path]
+			if file != nil {
+				file.load()
+				file.write()
+			}
+		}
+	}
 }

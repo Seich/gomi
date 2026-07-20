@@ -48,6 +48,30 @@ type file struct {
 	Children  []*file
 
 	Type FileType
+
+	config *gomiConfig
+}
+
+func (file *file) load() *file {
+	switch file.Type {
+	case FiletypePost:
+		loadPost(file)
+	case FiletypePage:
+		loadPage(file)
+	case FiletypePhoto:
+		loadPhoto(file)
+	}
+
+	return file
+}
+
+func (file *file) write() {
+	switch file.Type {
+	case FiletypeCopy, FiletypePhoto:
+		file.copyToDest()
+	case FiletypePost, FiletypePage:
+		file.writeFile(file.config)
+	}
 }
 
 func (file *file) writeFile(config *gomiConfig) {

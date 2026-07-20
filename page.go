@@ -8,8 +8,37 @@ import (
 	"strings"
 )
 
+func loadPage(page *file) {
+	dest := strings.Replace(page.src, filepath.Clean(page.config.input), "", 1)
+	dest = filepath.Join(filepath.Clean(page.config.output), dest)
+	fileContent, err := os.ReadFile(page.src)
+	check(err)
+
+	page.dest = dest
+	page.Content = fileContent
+
+	if isMarkdownFile(page.src) {
+		buf, meta := parsePostMarkdown(page.config.markdownParser, fileContent)
+		page.Title = meta.Title
+		page.Tags = meta.Tags
+		page.dest = strings.Replace(page.dest, ".md", ".html", 1)
+
+		layout := findLayoutFor(*page.config, page.src)
+		if layout != nil {
+			buf = []byte(strings.Replace(string(layout), "{{ content }}", string(buf), 1))
+		}
+
+		page.Content = buf
+	}
+
+	check(err)
+
+	page.Url = page.dest[len(page.config.output):]
+	page.Content = []byte(strings.Replace(string(page.Content), "{{ content }}", string(page.Content), 1))
+	page.Type = FiletypePage
+}
+
 func loadPages(config *gomiConfig) {
-	var pages []*file
 	filepath.WalkDir(config.input, func(path string, d fs.DirEntry, err error) error {
 		check(err)
 
@@ -27,41 +56,16 @@ func loadPages(config *gomiConfig) {
 			return nil
 		}
 
-		dest := strings.Replace(path, filepath.Clean(config.input), "", 1)
-		dest = filepath.Join(filepath.Clean(config.output), dest)
-		page := file{src: path, dest: dest, Type: FiletypeCopy}
+		f := file{src: path, Type: FiletypePage, config: config}
 
 		if shouldBeCopied(path) {
-			config.files = append(config.files, &page)
-			return nil
+			dest := strings.Replace(path, filepath.Clean(config.input), "", 1)
+			dest = filepath.Join(filepath.Clean(config.output), dest)
+			f.dest = dest
+			f.Type = FiletypeCopy
 		}
 
-		fileContent, err := os.ReadFile(path)
-		check(err)
-
-		page.Content = fileContent
-
-		if isMarkdownFile(path) {
-			buf, meta := parsePostMarkdown(config.markdownParser, fileContent)
-			page.Title = meta.Title
-			page.Tags = meta.Tags
-			page.dest = strings.Replace(page.dest, ".md", ".html", 1)
-
-			layout := findLayoutFor(*config, path)
-			if layout != nil {
-				buf = []byte(strings.Replace(string(layout), "{{ content }}", string(buf), 1))
-			}
-
-			page.Content = buf
-		}
-
-		check(err)
-
-		page.Url = page.dest[len(config.output):]
-		page.Content = []byte(strings.Replace(string(page.Content), "{{ content }}", string(page.Content), 1))
-		page.Type = FiletypePage
-
-		pages = append(pages, &page)
+		config.files = append(config.files, &f)
 
 		return nil
 	})
