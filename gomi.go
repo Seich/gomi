@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/alexflint/go-arg"
 	"github.com/charmbracelet/log"
+	"github.com/jaschaephraim/lrserver"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/sgtdi/fswatcher"
 )
@@ -45,11 +47,20 @@ func main() {
 	gomi := NewGomiConfig(args)
 
 	if args.Watch != nil {
-		w, _ := fswatcher.New(
+		gomi.hot = true
+		gomi.writeAll()
+
+		go http.ListenAndServe(":8000", http.FileServer(http.Dir(gomi.output)))
+		lr := lrserver.New(lrserver.DefaultName, lrserver.DefaultPort)
+		go lr.ListenAndServe()
+
+		w, err := fswatcher.New(
 			fswatcher.WithCooldown(200*time.Millisecond),
 			fswatcher.WithPath(gomi.input),
 			fswatcher.WithExcRegex(`db\.json$`),
 		)
+
+		check(err)
 
 		ctx := context.Background()
 		go w.Watch(ctx)
@@ -63,6 +74,7 @@ func main() {
 			if file != nil {
 				file.load()
 				file.write()
+				lr.Reload(path)
 			}
 		}
 	}

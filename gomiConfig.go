@@ -30,6 +30,8 @@ type gomiConfig struct {
 
 	liquidEngine   *liquid.Engine
 	markdownParser goldmark.Markdown
+
+	hot bool
 }
 
 func (config *gomiConfig) Load() {
@@ -77,7 +79,7 @@ func (config *gomiConfig) GenerateBlogFeed() {
 	log.Info("Generated", "Feed", feedPath)
 }
 
-func (config *gomiConfig) WriteAll() {
+func (config *gomiConfig) writeAll() {
 	for _, file := range config.files {
 		if file.dest == "" {
 			log.Warn("Emitting file not possible", "file", file.src)
@@ -117,6 +119,12 @@ func (config *gomiConfig) Posts() []file {
 	return posts
 }
 
+func (config *gomiConfig) buildRelationShips() {
+	for _, file := range config.files {
+		file.loadRelationships()
+	}
+}
+
 func NewGomiConfig(args args) *gomiConfig {
 	postsDir := filepath.Join(args.Input, "_posts")
 	photosDir := filepath.Join(args.Input, "_photos")
@@ -139,7 +147,8 @@ func NewGomiConfig(args args) *gomiConfig {
 	}
 
 	gomi.Load()
-	gomi.WriteAll()
+	gomi.buildRelationShips()
+	gomi.writeAll()
 	gomi.GenerateBlogFeed()
 
 	return gomi

@@ -20,6 +20,7 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
@@ -30,6 +31,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/image v0.41.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
@@ -39,6 +41,7 @@ require (
 	github.com/anthonynsimon/bild v0.16.1
 	github.com/charmbracelet/log v1.0.0
 	github.com/gorilla/feeds v1.2.0
+	github.com/jaschaephraim/lrserver v0.0.0-20240306232639-afed386b3640
 	github.com/osteele/tuesday v1.0.4 // indirect
 	github.com/sgtdi/fswatcher v1.3.0
 	github.com/tidwall/gjson v1.19.0

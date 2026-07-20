@@ -69,8 +69,6 @@ func loadPages(config *gomiConfig) {
 
 		return nil
 	})
-
-	buildRelationShips(*config)
 }
 
 func isMarkdownFile(path string) bool {
@@ -83,51 +81,6 @@ func shouldBeCopied(path string) bool {
 	shouldBePreprocessed := slices.Contains(extensions, ext)
 
 	return !shouldBePreprocessed
-}
-
-func buildRelationShips(config gomiConfig) []*file {
-	var filesWithRelationships []*file
-	for _, file := range config.files {
-		ancestor, siblings, children := getPageRelationships(file.dest, config)
-
-		file.Ancestors = ancestor
-		file.Siblings = siblings
-		file.Children = children
-
-		filesWithRelationships = append(filesWithRelationships, file)
-	}
-
-	return filesWithRelationships
-}
-
-func getPageRelationships(path string, config gomiConfig) ([]*file, []*file, []*file) {
-	ancestorPath := filepath.Join(path, "..", "..", "..")
-	siblingsPath := filepath.Join(path, "..", "..")
-	childrenPath := filepath.Join(path, "..")
-
-	var ancestor []*file
-	var siblings []*file
-	var children []*file
-
-	for _, p := range config.files {
-		if filepath.Dir(p.dest) == config.output {
-			continue
-		}
-
-		if pageIsInPath(p.dest, ancestorPath) {
-			ancestor = append(ancestor, p)
-		}
-
-		if pageIsInPath(p.dest, siblingsPath) {
-			siblings = append(siblings, p)
-		}
-
-		if pageIsInPath(p.dest, childrenPath) {
-			children = append(children, p)
-		}
-	}
-
-	return ancestor, siblings, children
 }
 
 func pageIsInPath(file, path string) bool {

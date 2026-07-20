@@ -94,10 +94,19 @@ func (file *file) writeFile(config *gomiConfig) {
 		"page": file,
 	}
 
-	layout := strings.Replace(string(layoutTemplate), "{{ content }}", string(file.Content), 1)
+	fileContent := string(file.Content)
+
+	if config.hot {
+		fileContent = fileContent + "<script src=\"http://localhost:35729/livereload.js\"></script>"
+	}
+
+	layout := strings.Replace(string(layoutTemplate), "{{ content }}", fileContent, 1)
 
 	page, err := config.liquidEngine.ParseAndRender([]byte(layout), bindings)
-	check(err)
+	if err != nil {
+		page = []byte(err.Error())
+		log.Warn(err)
+	}
 
 	n, err := f.Write(page)
 	check(err)
@@ -115,6 +124,38 @@ func (file *file) copyToDest() {
 	check(err)
 
 	log.Info("Copying", "File", file.src, "To", file.dest)
+}
+
+func (f *file) loadRelationships() {
+	ancestorPath := filepath.Join(f.dest, "..", "..", "..")
+	siblingsPath := filepath.Join(f.dest, "..", "..")
+	childrenPath := filepath.Join(f.dest, "..")
+
+	var ancestor []*file
+	var siblings []*file
+	var children []*file
+
+	for _, p := range f.config.files {
+		if filepath.Dir(p.dest) == f.config.output || p.Type != FiletypePage {
+			continue
+		}
+
+		if pageIsInPath(p.dest, ancestorPath) {
+			ancestor = append(ancestor, p)
+		}
+
+		if pageIsInPath(p.dest, siblingsPath) {
+			siblings = append(siblings, p)
+		}
+
+		if pageIsInPath(p.dest, childrenPath) {
+			children = append(children, p)
+		}
+	}
+
+	f.Ancestors = ancestor
+	f.Siblings = siblings
+	f.Children = children
 }
 
 func findLayoutFor(config gomiConfig, path string) []byte {
