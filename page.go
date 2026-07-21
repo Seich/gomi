@@ -23,9 +23,8 @@ func loadPage(page *file) {
 		page.Tags = meta.Tags
 		page.dest = strings.Replace(page.dest, ".md", ".html", 1)
 
-		layout := findLayoutFor(*page.config, page.src)
-		if layout != nil {
-			buf = []byte(strings.Replace(string(layout), "{{ content }}", string(buf), 1))
+		if page.layout != nil {
+			buf = []byte(strings.Replace(string(page.layout.Content), "{{ content }}", string(buf), 1))
 		}
 
 		page.Content = buf
@@ -38,7 +37,10 @@ func loadPage(page *file) {
 	page.Type = FiletypePage
 }
 
-func loadPages(config *gomiConfig) {
+func addPages(config *gomiConfig) {
+	layout := filepath.Join(config.input, "_layout.html")
+	config.loadLayout(layout)
+
 	filepath.WalkDir(config.input, func(path string, d fs.DirEntry, err error) error {
 		check(err)
 
@@ -56,7 +58,8 @@ func loadPages(config *gomiConfig) {
 			return nil
 		}
 
-		f := file{src: path, Type: FiletypePage, config: config}
+		layout := findLayoutFor(config, path)
+		f := file{src: path, Type: FiletypePage, config: config, layout: layout}
 
 		if shouldBeCopied(path) {
 			dest := strings.Replace(path, filepath.Clean(config.input), "", 1)

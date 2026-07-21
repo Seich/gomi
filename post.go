@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"io/fs"
 	"net/url"
 	"os"
@@ -12,13 +11,8 @@ import (
 )
 
 func loadPost(f *file) {
-	layoutTemplate := []byte("{{ content }}")
-
-	layoutTemplate, err := os.ReadFile(filepath.Join(f.config.postsDir, "_layout.html"))
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		check(err)
-	}
-
+	layoutPath := filepath.Join(f.config.postsDir, "_layout.html")
+	layout := f.config.getLayout(layoutPath)
 	path := f.src
 
 	postDate, postUrl, postFilesDir := parsePostFilename(path)
@@ -37,6 +31,7 @@ func loadPost(f *file) {
 	f.Title = meta.Title
 	f.Tags = meta.Tags
 	f.Type = FiletypePost
+	f.layout = layout
 
 	// Parse liquid within markdown post
 	content, err := f.config.liquidEngine.ParseAndRender(buf, map[string]any{"post": *f})
@@ -45,16 +40,19 @@ func loadPost(f *file) {
 	f.Content = content
 
 	// Parse the page's layout and liquid templates
-	page, err := f.config.liquidEngine.ParseAndRender(layoutTemplate, map[string]any{"post": *f})
+	page, err := f.config.liquidEngine.ParseAndRender(layout.Content, map[string]any{"post": *f})
 	check(err)
 
 	f.Content = page
 }
 
-func loadPosts(config *gomiConfig) {
+func addPosts(config *gomiConfig) {
 	if !directoryExists(config.postsDir) {
 		return
 	}
+
+	layoutPath := filepath.Join(config.postsDir, "_layout.html")
+	config.loadLayout(layoutPath)
 
 	filepath.WalkDir(config.postsDir, func(path string, d fs.DirEntry, err error) error {
 		check(err)

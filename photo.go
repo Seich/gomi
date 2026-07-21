@@ -111,7 +111,7 @@ func loadPhoto(f *file) {
 	db.save()
 }
 
-func loadPhotos(config *gomiConfig) {
+func addPhotos(config *gomiConfig) {
 	if !directoryExists(config.photosDir) {
 		return
 	}

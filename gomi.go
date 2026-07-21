@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/alexflint/go-arg"
@@ -71,10 +73,28 @@ func main() {
 		for event := range w.Events() {
 			path := event.Path[len(cwd)+1:]
 			file := gomi.fileMap[path]
-			if file != nil {
-				file.load()
-				file.write()
-				lr.Reload(path)
+
+			if path == filepath.Join(gomi.input, "_layout.html") {
+				gomi = NewGomiConfig(args)
+				gomi.hot = true
+				gomi.writeAll()
+				lr.Reload("")
+			} else if file != nil {
+				if strings.Contains(path, "_layout.html") {
+					layout := gomi.getLayout(path)
+					layout.load()
+					for _, file := range gomi.files {
+						if file.layout == layout {
+							file.load()
+							file.write()
+						}
+					}
+					lr.Reload("")
+				} else {
+					file.load()
+					file.write()
+					lr.Reload(path)
+				}
 			}
 		}
 	}

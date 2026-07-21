@@ -17,6 +17,7 @@ const (
 	FiletypePost
 	FiletypePage
 	FiletypePhoto
+	FiletypeLayout
 )
 
 var fileTypeNames = map[FileType]string{
@@ -49,6 +50,7 @@ type file struct {
 
 	Type FileType
 
+	layout *file
 	config *gomiConfig
 }
 
@@ -60,6 +62,8 @@ func (file *file) load() *file {
 		loadPage(file)
 	case FiletypePhoto:
 		loadPhoto(file)
+	case FiletypeLayout:
+		file.config.loadLayout(file.src)
 	}
 
 	return file
@@ -158,7 +162,7 @@ func (f *file) loadRelationships() {
 	f.Children = children
 }
 
-func findLayoutFor(config gomiConfig, path string) []byte {
+func findLayoutFor(config *gomiConfig, path string) *file {
 	dir, _ := filepath.Split(path)
 
 	for true {
@@ -169,14 +173,10 @@ func findLayoutFor(config gomiConfig, path string) []byte {
 			return nil
 		}
 
-		file, err := os.Stat(filename)
-		if !errors.Is(err, os.ErrNotExist) {
-			check(err)
-		}
+		layout, err := config.loadLayout(filename)
+		check(err)
 
-		if file != nil {
-			layout, err := os.ReadFile(filename)
-			check(err)
+		if layout != nil {
 			return layout
 		}
 

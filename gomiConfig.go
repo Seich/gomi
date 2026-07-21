@@ -28,6 +28,8 @@ type gomiConfig struct {
 	files   []*file
 	fileMap map[string]*file
 
+	layoutMap map[string]*file
+
 	liquidEngine   *liquid.Engine
 	markdownParser goldmark.Markdown
 
@@ -35,9 +37,9 @@ type gomiConfig struct {
 }
 
 func (config *gomiConfig) Load() {
-	loadPages(config)
-	loadPosts(config)
-	loadPhotos(config)
+	addPages(config)
+	addPosts(config)
+	addPhotos(config)
 	config.fileMap = make(map[string]*file)
 	for _, file := range config.files {
 		file.load()
@@ -81,10 +83,6 @@ func (config *gomiConfig) GenerateBlogFeed() {
 
 func (config *gomiConfig) writeAll() {
 	for _, file := range config.files {
-		if file.dest == "" {
-			log.Warn("Emitting file not possible", "file", file.src)
-			continue
-		}
 		file.write()
 	}
 }
@@ -125,6 +123,36 @@ func (config *gomiConfig) buildRelationShips() {
 	}
 }
 
+func (config *gomiConfig) loadLayout(path string) (*file, error) {
+	if !directoryExists(path) {
+		return nil, nil
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	f := config.layoutMap[path]
+	if f == nil {
+		f = &file{src: path, config: config, Type: FiletypeLayout, Content: content}
+		config.files = append(config.files, f)
+		config.layoutMap[path] = f
+	}
+
+	f.Content = content
+
+	return f, nil
+}
+
+func (config *gomiConfig) getLayout(path string) *file {
+	if config.layoutMap[path] != nil {
+		return config.layoutMap[path]
+	}
+
+	return nil
+}
+
 func NewGomiConfig(args args) *gomiConfig {
 	postsDir := filepath.Join(args.Input, "_posts")
 	photosDir := filepath.Join(args.Input, "_photos")
@@ -144,6 +172,7 @@ func NewGomiConfig(args args) *gomiConfig {
 		photosDir:       photosDir,
 		liquidEngine:    newLiquidEngine(),
 		markdownParser:  newMarkdownParser(args.HighlightTheme),
+		layoutMap:       make(map[string]*file),
 	}
 
 	gomi.Load()
