@@ -1,0 +1,46 @@
+name: Build Gomi
+
+on:   
+  release:
+      types:
+        - created
+
+permissions:
+  contents: write
+  checks: write
+
+  actions: read
+  issues: read
+  packages: write
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+
+jobs:
+  CompileBinaries:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+
+      - name: Install deps
+        run: go get .
+
+      - name: Build Linux
+        run: GOOS=linux GOARCH=amd64 go build -o gomi-linux-amd64 .
+
+      - name: Build Macos
+        run: GOOS=darwin GOARCH=arm64 go build -o gomi-darwin-amd64 .
+
+      - name: Upload release binaries
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["./gomi-*"]'
