@@ -54,6 +54,8 @@ func main() {
 
 		go http.ListenAndServe(":8000", http.FileServer(http.Dir(gomi.output)))
 		lr := lrserver.New(lrserver.DefaultName, lrserver.DefaultPort)
+		lr.SetErrorLog(log.Default().StandardLog())
+		lr.SetStatusLog(log.Default().StandardLog())
 		go lr.ListenAndServe()
 
 		w, err := fswatcher.New(

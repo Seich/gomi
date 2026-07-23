@@ -5,6 +5,7 @@ import (
 
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"go.abhg.dev/goldmark/frontmatter"
@@ -17,6 +18,8 @@ func newMarkdownParser(highlightTheme string) goldmark.Markdown {
 			highlighting.NewHighlighting(
 				highlighting.WithStyle(highlightTheme),
 			),
+			extension.Footnote,
+			extension.GFM,
 		),
 		goldmark.WithRendererOptions(
 			html.WithUnsafe(),
